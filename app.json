@@ -108,7 +108,7 @@
       "required": false
     },
     "HEROKU_API": {
-      "description": "Your Heroku API key for updater to work. Generate one at https://dashboard.heroku",
+      "description": "Your Heroku API key for updater to work. Generate one at https://dashboard.heroku.com/account/applications/authorizations/new.",
       "required": true
     },
     "USERBOT_LOAD": {
