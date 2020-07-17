@@ -11,9 +11,11 @@ See also https://aman-a.gitbook.io/nana-remix/faq for more. We'll update the FAQ
 frequently asked in both Issue Tracker and Community Chat.
 
 **Q: Why need Assistant (Real bot)?**
+
 A: Because real bot will help you a lot for many things, and make user easy to use it.
 
 **Q: Why Nana Unique?**
+
 A: What Nana makes a Unique userbot is because of the assistant to control your userbot.
 
 ## Installation Guide
