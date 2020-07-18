@@ -1,11 +1,12 @@
 from datetime import datetime
 from time import sleep
+import spamwatch
 
 from pyrogram import Filters, User
 from pyrogram.api import functions
 from pyrogram.errors import PeerIdInvalid
 
-from nana import app, Command
+from nana import app, Command, sw_api
 from nana.helpers.PyroHelpers import ReplyCheck
 
 __MODULE__ = "Whois"
@@ -25,7 +26,9 @@ WHOIS = (
     " - **Username**: `{username}`\n"
     " - **Last Online**: `{last_online}`\n"
     " - **Common Groups**: `{common_groups}`\n"
-    " - **Profile**: [link](tg://user?id={user_id})")
+    " - **Contact**: `{is_contact}`\n"
+    " - **Profile**: [link](tg://user?id={user_id})\n"
+    )
 
 
 def LastOnline(user: User):
@@ -54,10 +57,6 @@ async def GetCommon(client, get_user):
     return common
 
 
-def FullName(user: User):
-    return user.first_name + " " + user.last_name if user.last_name else user.first_name
-
-
 def ProfilePicUpdate(user_pic):
     return datetime.fromtimestamp(user_pic[0].date).strftime("%d.%m.%Y, %H:%M:%S")
 
@@ -68,7 +67,10 @@ async def whois(client, message):
     if not message.reply_to_message and len(cmd) == 1:
         get_user = message.from_user.id
     elif message.reply_to_message and len(cmd) == 1:
-        get_user = message.reply_to_message.from_user.id
+        if message.reply_to_message.forward_from:
+            get_user = message.reply_to_message.forward_from.id
+        else:
+            get_user = message.reply_to_message.from_user.id
     elif len(cmd) > 1:
         get_user = cmd[1]
         try:
@@ -87,14 +89,45 @@ async def whois(client, message):
     common = await GetCommon(client, user.id)
 
     if user:
-        await message.edit(
-            WHOIS.format(
-                full_name=FullName(user),
-                user_id=user.id,
-                first_name=user.first_name,
-                last_name=user.last_name if user.last_name else "",
-                username=user.username if user.username else "",
-                last_online=LastOnline(user),
-                common_groups=len(common.chats),
-                bio=desc if desc else "`No bio set up.`"),
+        if sw_api:
+            sw = spamwatch.Client(sw_api)
+            status = sw.get_ban(user.id)
+            if status == False:
+                await message.edit(f"""
+**About {user.first_name} {user.last_name if user.last_name else ''}**:
+  - **UserID**: `{user.id}`
+  - **Username**: `{user.username if user.username else ''}`
+  - **Last Online**: `{LastOnline(user)}`
+  - **Common Groups**: `{len(common.chats)}`
+  - **Contact**: `{user.is_contact}`
+  - **Profile**: [link](tg://user?id={user.id})
+**SpamWatch Banned** : `False`
+                """,
+                disable_web_page_preview=True)
+                return
+            else:
+                await message.edit(f"""
+**About {user.first_name} {user.last_name if user.last_name else ''}**:
+  - **UserID**: `{user.id}`
+  - **Username**: `{user.username if user.username else ''}`
+  - **Last Online**: `{LastOnline(user)}`
+  - **Common Groups**: `{len(common.chats)}`
+  - **Contact**: `{user.is_contact}`
+  - **Profile**: [link](tg://user?id={user.id})
+**SpamWatch Banned** : `True`
+  • **Reason**: `{status.reason}`
+  • **Message**: `{status.message}`
+                """,
+                disable_web_page_preview=True)
+                return
+        else:
+            await message.edit(f"""
+**About {user.first_name} {user.last_name if user.last_name else ''}**:
+  - **UserID**: `{user.id}`
+  - **Username**: `{user.username if user.username else ''}`
+  - **Last Online**: `{LastOnline(user)}`
+  - **Common Groups**: `{len(common.chats)}`
+  - **Contact**: `{user.is_contact}`
+  - **Profile**: [link](tg://user?id={user.id})
+            """,
             disable_web_page_preview=True)
