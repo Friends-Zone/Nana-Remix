@@ -35,7 +35,7 @@ async def update_changelog(changelog):
     await setbot.send_sticker(Owner, random.choice(RANDOM_STICKERS))
     text = "**Update successfully!**\n"
     text += (
-        f"🎉 Welcome to Nana Bot v{USERBOT_VERSION} & Assistant v{ASSISTANT_VERSION}\n"
+        f"🎉 Welcome to Nana Userot v{USERBOT_VERSION} & Assistant v{ASSISTANT_VERSION}\n"
     )
     text += "\n──「 **Update changelogs** 」──\n"
     text += changelog
@@ -138,12 +138,12 @@ async def update_button(client, query):
                 remote = repo.create_remote("heroku", heroku_git_url)
             remote.push(refspec="HEAD:refs/heads/master")
         else:
-            await client.send_message(Owner, "no heroku application found, but a key given? 😕 ")
-        await client.send_message(Owner, "Build Unsuccess, Check heroku build log for more detail")
+            await client.send_message(Owner, "Why the fuck you added your Heroku API key in an non-Heroku environment? 😕 ")
+        await client.send_message(Owner, "Build failed, check your Heroku app logs and fix it. If symptoms presist, file a new issue.")
         return
     try:
         upstream.pull(brname)
-        await client.send_message(Owner, "Successfully Updated!\nBot is restarting...")
+        await client.send_message(Owner, "Successfully updated!\nRestarting at will...")
     except GitCommandError:
         repo.git.reset("--hard")
         repo.git.clean("-fd", "nana/modules/")
@@ -151,7 +151,7 @@ async def update_button(client, query):
         repo.git.clean("-fd", "nana/helpers/")
         await client.send_message(
             Owner,
-            "Successfully Force Updated!\nBot is restarting..."
+            "Successfully force updated!\nRestarting at will..."
         )
     await update_changelog(changelog)
     await restart_all()

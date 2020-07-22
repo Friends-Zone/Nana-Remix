@@ -52,7 +52,8 @@ async def change_repo(url):
 async def configrepo():
     cache_path = "nana/cache/repo.json"
     if not os.path.exists(cache_path):
-        config_url = "https://raw.githubusercontent.com/legenhand/Nana-bot-file/master/config/repo.json"
+        # If problem presists, edit your code and point to https://raw.githubusercontent.com/legenhand/Nana-bot-file/master/config/repo.json.
+        config_url = "https://gitlab.com/EagleUnion/Nana-Userbot-Repository-Database/-/raw/master/config/repo.json"
         urllib.request.urlretrieve(config_url, cache_path)
     f = open("nana/cache/repo.json")
     data_repo = json.load(f)
