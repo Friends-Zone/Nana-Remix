@@ -1,6 +1,9 @@
-# Session
-What it is?
-This place where your session output is.
+# Session Files
 
-# WARNING
-Do not share any of this file to public or push to git, else someone will hack your account!
+**What it is?** This place where your session output is.
+
+# An warning before commiting
+
+**Treat Telegram session files like your passwords and API keys!** Even we had gitignored everything here,
+please DO NOT share them with your App ID and Hash to anyone. Someone might hijack your account,
+and even get it nuked (a.k.a. deleted your account).

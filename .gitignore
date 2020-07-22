@@ -113,9 +113,15 @@ unknown_errors.txt
 nana/logs/*
 !nana/logs/README.md
 nana/modules/test_admin.py
+
+# IDE files
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/misc.xml
 .idea/modules.xml
 .idea/Nana-Remix.iml
 .idea/dictionaries/Aman.xml
+
+# Session files
+nana/session/*.session
+!nana/session/README.md
