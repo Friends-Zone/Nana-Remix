@@ -8,16 +8,16 @@ Currently work fine perfectly, but some features may give you error. Please repo
 
 ## Installation Guide
 
-See our documentation to get [Installation Guide](https://aman-a.gitbook.io/nana-remix).
+[Visit the documentation](https://aman-a.gitbook.io/nana-remix) o learn more how to setup your own Nana userbot + assistant.
 
 ## Community
 
 Have questions about Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly
 community will answer you some questions.
 
-### Credits
+## Credits
 
-- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot)
-- [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended)
+- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot) by @raphielscape and the @RaphielGang squad.
+- [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended) by @AvinashReddy3108
 - [Ayra Hikari](https://github.com/AyraHikari)
 - [LegenHand](https://github.com/legenhand)
