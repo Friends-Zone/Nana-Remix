@@ -44,18 +44,17 @@ async def termux_torch(_client, message):
         subprocess.Popen("termux-torch off", shell=True, stdout=subprocess.PIPE)
         torch = False
         await message.edit("Torch turned off")
-        await sleep(2.0)
-        await message.delete()
     else:
         await message.edit("Turning on torch...")
         try:
             subprocess.Popen("termux-torch on", shell=True, stdout=subprocess.PIPE)
-        except:
+        except Exception as e:
+            print(e)
             await message.edit("Couldn't turn off torch!")
             await sleep(2.0)
             await message.delete()
             return
         torch = True
         await message.edit("Torch turned on!")
-        await sleep(2.0)
-        await message.delete()
+    await sleep(2.0)
+    await message.delete()

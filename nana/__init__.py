@@ -1,3 +1,6 @@
+"""
+The initial start of Nana-Remix
+"""
 import logging
 import os
 import sys
@@ -50,7 +53,6 @@ if ENV:
     # Version
     lang_code = os.environ.get('lang_code', "en")
     device_model = os.environ.get('device_model', "PC")
-    app_version = "💝 Nana v{}".format(USERBOT_VERSION)
     system_version = os.environ.get('system_version', "Linux")
 
     # Must be filled
@@ -61,14 +63,6 @@ if ENV:
     USERBOT_SESSION = os.environ.get('USERBOT_SESSION', None)
     ASSISTANT_SESSION = os.environ.get('ASSISTANT_SESSION', None)
 
-    # Required for some features
-    # Set temp var for load later
-    Owner = 0
-    OwnerName = ""
-    OwnerUsername = ""
-    BotID = 0
-    BotName = ""
-    BotUsername = ""
     # From config
     Command = os.environ.get("Command", "! . - ^").split()
     NANA_WORKER = int(os.environ.get('NANA_WORKER', 8))
@@ -93,6 +87,8 @@ if ENV:
     remove_bg_api = os.environ.get('remove_bg_api', None)
     sw_api = os.environ.get('sw_api', None)
     HEROKU_API = os.environ.get('HEROKU_API', None)
+    IBM_WATSON_CRED_URL = os.environ.get('IBM_WATSON_CRED_URL', None)
+    IBM_WATSON_CRED_PASSWORD = os.environ.get('IBM_WATSON_CRED_PASSWORD', None)
     # LOADER
     USERBOT_LOAD = os.environ.get("USERBOT_LOAD", "").split()
     USERBOT_NOLOAD = os.environ.get("USERBOT_NOLOAD", "").split()
@@ -113,7 +109,6 @@ else:
     # Version
     lang_code = Config.lang_code
     device_model = Config.device_model
-    app_version = "💝 Nana v{}".format(USERBOT_VERSION)
     system_version = Config.system_version
 
     # Must be filled
@@ -123,14 +118,6 @@ else:
     # Session
     USERBOT_SESSION = Config.USERBOT_SESSION
     ASSISTANT_SESSION = Config.ASSISTANT_SESSION
-    # Required for some features
-    # Set temp var for load later
-    Owner = 0
-    OwnerName = ""
-    OwnerUsername = ""
-    BotID = 0
-    BotName = ""
-    BotUsername = ""
     # From config
     Command = Config.Command
     NANA_WORKER = Config.NANA_WORKER
@@ -141,11 +128,13 @@ else:
     sw_api = Config.sw_api
     screenshotlayer_API = Config.screenshotlayer_API
     bitly_token = [Config.bitly_token]
-    gdrive_credentials = None
+    gdrive_credentials = Config.gdrive_credentials
     lydia_api = Config.lydia_api
     HEROKU_API = Config.HEROKU_API
     remove_bg_api = Config.remove_bg_api
     NANA_IMG = Config.NANA_IMG
+    IBM_WATSON_CRED_URL = Config.IBM_WATSON_CRED_URL
+    IBM_WATSON_CRED_PASSWORD = Config.IBM_WATSON_CRED_PASSWORD
     # LOADER
     USERBOT_LOAD = Config.USERBOT_LOAD
     USERBOT_NOLOAD = Config.USERBOT_NOLOAD
@@ -158,6 +147,15 @@ else:
     REMINDER_UPDATE = Config.REMINDER_UPDATE
     TEST_MODE = Config.TEST_MODE
     TERMUX_USER = Config.TERMUX_USER
+OwnerName = ""
+app_version = "💝 Nana v{}".format(USERBOT_VERSION)
+BotUsername = ""
+BotID = 0
+# Required for some features
+# Set temp var for load later
+Owner = 0
+BotName = ""
+OwnerUsername = ""
 if os.path.exists("nana/logs/error.log"):
     f = open("nana/logs/error.log", "w")
     f.write("PEAK OF THE LOGS FILE")

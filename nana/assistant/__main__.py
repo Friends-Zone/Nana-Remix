@@ -3,16 +3,60 @@ import time
 from platform import python_version
 
 import heroku3
-from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton, errors, ReplyKeyboardMarkup
+from pyrogram import (
+    Filters,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    errors,
+    ReplyKeyboardMarkup,
+)
 
-from nana import app, setbot, AdminSettings, DB_AVAILABLE, USERBOT_VERSION, ASSISTANT_VERSION, BotUsername, HEROKU_API, \
-    Owner, OwnerName, NANA_IMG
+from nana import (
+    app,
+    setbot,
+    AdminSettings,
+    DB_AVAILABLE,
+    USERBOT_VERSION,
+    ASSISTANT_VERSION,
+    BotUsername,
+    HEROKU_API,
+    Owner,
+    OwnerName,
+    NANA_IMG,
+)
 from nana.__main__ import reload_userbot, restart_all
-from .repo_changer import change_repo
+
 
 if DB_AVAILABLE:
     from nana.assistant.database.stickers_db import set_sticker_set, set_stanim_set
     from nana.modules.database.chats_db import get_all_chats
+
+
+@setbot.on_message(Filters.private & ~Filters.user(AdminSettings))
+async def un_auth(_client, message):
+    if message.chat.id is not AdminSettings:
+        msg = f"""
+Hi {message.chat.first_name},
+You must be looking forward on how I work.
+In that case I can give you helpful links to self host me on your own.
+Here are some links for you
+        """
+        buttons = [
+            [
+                InlineKeyboardButton(
+                    "Documentation", url="https://aman-a.gitbook.io/nana-remix/"
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    "Repository", url="https://github.com/pokurt/Nana-Remix"
+                ),
+                InlineKeyboardButton("Support", url="https://t.me/nanabotsupport"),
+            ],
+        ]
+        await message.reply(msg, reply_markup=InlineKeyboardMarkup(buttons))
+    else:
+        return
 
 
 @setbot.on_message(Filters.user(AdminSettings) & Filters.command(["start"]))
@@ -23,7 +67,8 @@ async def start(_client, message):
     if len(message.text.split()) >= 2:
         helparg = message.text.split()[1]
         if helparg == "help_inline":
-            await message.reply("""**Inline Guide**
+            await message.reply(
+                """**Inline Guide**
 Just type `@{} (command)` in text box, and wait for response.
 
 ──「 **Get Note from Inline** 」──
@@ -35,13 +80,10 @@ And wait for list of notes in inline, currently support Text and Button only.
 Convert a text to various style, can be used anywhere!
 
 * = Can be used as optional
-""".format(BotUsername))
-            return
-        if helparg == "createown":
-            await message.reply(
-                "Want to create your own Userbot and Assistant?\n[Go here]("
-                "https://github.com/AyraHikari/Nana-TgBot/wiki), read guide carefully.\nIf you want to ask, "
-                "join our community @AyraSupport")
+""".format(
+                    BotUsername
+                )
+            )
             return
     try:
         me = await app.get_me()
@@ -62,9 +104,12 @@ Convert a text to various style, can be used anywhere!
     start_message += "===================\n"
     start_message += "`For more about the bot press button down below`"
     buttons = InlineKeyboardMarkup(
-                [[InlineKeyboardButton(text="Help", callback_data="help_back")]])
+        [[InlineKeyboardButton(text="Help", callback_data="help_back")]]
+    )
     if NANA_IMG:
-        await setbot.send_photo(Owner, NANA_IMG, caption=start_message, reply_markup=buttons)
+        await setbot.send_photo(
+            Owner, NANA_IMG, caption=start_message, reply_markup=buttons
+        )
     else:
         await setbot.send_message(Owner, start_message, reply_markup=buttons)
 
@@ -77,10 +122,7 @@ async def get_myself(client, message):
         message.reply("Bot is currently turned off!")
         return
     getphoto = await client.get_profile_photos(me.id)
-    if len(getphoto) == 0:
-        getpp = None
-    else:
-        getpp = getphoto[0].file_id
+    getpp = None if len(getphoto) == 0 else getphoto[0].file_id
     text = "**ℹ️ Your profile:**\n"
     text += "First name: {}\n".format(me.first_name)
     if me.last_name:
@@ -91,14 +133,20 @@ async def get_myself(client, message):
     text += "Phone number: `{}`\n".format(me.phone_number)
     text += "`Nana Version    : v{}`\n".format(USERBOT_VERSION)
     text += "`Manager Version : v{}`".format(ASSISTANT_VERSION)
-    button = InlineKeyboardMarkup([[InlineKeyboardButton("Hide phone number", callback_data="hide_number")]])
+    button = InlineKeyboardMarkup(
+        [[InlineKeyboardButton("Hide phone number", callback_data="hide_number")]]
+    )
     if me.photo:
-        await client.send_photo(message.chat.id, photo=getpp, caption=text, reply_markup=button)
+        await client.send_photo(
+            message.chat.id, photo=getpp, caption=text, reply_markup=button
+        )
     else:
         await message.reply(text, reply_markup=button)
 
 
-@setbot.on_message(Filters.user(AdminSettings) & Filters.command(["settings"]) & Filters.private)
+@setbot.on_message(
+    Filters.user(AdminSettings) & Filters.command(["settings"]) & Filters.private
+)
 async def settings(_client, message):
     try:
         me = await app.get_me()
@@ -113,17 +161,23 @@ async def settings(_client, message):
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     text += "\nJust setup what you need here"
-    if not me:
-        pass
-    else:
-        pass
-    list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")],
-                   [InlineKeyboardButton("Set Sticker", callback_data="setsticker")]]
+    list_button = [
+        [
+            InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ],
+        [InlineKeyboardButton("Set Sticker", callback_data="setsticker")],
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")])
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     await message.reply(text, reply_markup=button)
 
@@ -132,7 +186,7 @@ async def settings(_client, message):
 def dynamic_data_filter(data):
     return Filters.create(
         lambda flt, query: flt.data == query.data,
-        data=data  # "data" kwarg is accessed with "flt.data" above
+        data=data,  # "data" kwarg is accessed with "flt.data" above
     )
 
 
@@ -141,7 +195,9 @@ async def get_myself_btn(client, query):
     try:
         me = await app.get_me()
     except ConnectionError:
-        await client.answer_callback_query(query.id, "Bot is currently turned off!", show_alert=True)
+        await client.answer_callback_query(
+            query.id, "Bot is currently turned off!", show_alert=True
+        )
         return
 
     if query.message.caption:
@@ -149,15 +205,23 @@ async def get_myself_btn(client, query):
     else:
         text = query.message.text.markdown
 
-    num = []
-    num.append("*" * len(me.phone_number))
-
+    num = ["*" * len(me.phone_number)]
     if "***" not in text.split("Phone number: `")[1].split("`")[0]:
-        text = text.replace("Phone number: `{}`\n".format(me.phone_number), "Phone number: `{}`\n".format("".join(num)))
-        button = InlineKeyboardMarkup([[InlineKeyboardButton("Show phone number", callback_data="hide_number")]])
+        text = text.replace(
+            "Phone number: `{}`\n".format(me.phone_number),
+            "Phone number: `{}`\n".format("".join(num)),
+        )
+        button = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("Show phone number", callback_data="hide_number")]]
+        )
     else:
-        text = text.replace("Phone number: `{}`\n".format("".join(num)), "Phone number: `{}`\n".format(me.phone_number))
-        button = InlineKeyboardMarkup([[InlineKeyboardButton("Hide phone number", callback_data="hide_number")]])
+        text = text.replace(
+            "Phone number: `{}`\n".format("".join(num)),
+            "Phone number: `{}`\n".format(me.phone_number),
+        )
+        button = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("Hide phone number", callback_data="hide_number")]]
+        )
 
     if query.message.caption:
         await query.message.edit_caption(caption=text, reply_markup=button)
@@ -177,11 +241,27 @@ async def start_stop_bot(client, query):
         text += "-> Database: `{}`\n".format(DB_AVAILABLE)
         text += "-> Python: `{}`\n".format(python_version())
         text += "\n✅ Bot was started!"
-        list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                        InlineKeyboardButton("Restart Bot", callback_data="restart_bot")]]
+        list_button = [
+            [
+                InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+                InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+            ]
+        ]
         if HEROKU_API:
-            list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-            list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+            list_button.append(
+                [
+                    InlineKeyboardButton(
+                        "Restart Heroku app", callback_data="restart_heroku"
+                    )
+                ]
+            )
+            list_button.append(
+                [
+                    InlineKeyboardButton(
+                        "Change Repo Source", callback_data="change_repo"
+                    )
+                ]
+            )
         button = InlineKeyboardMarkup(list_button)
         try:
             await query.message.edit_text(text, reply_markup=button)
@@ -196,11 +276,19 @@ async def start_stop_bot(client, query):
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     text += "\n❎ Bot was stopped!"
-    list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")]]
+    list_button = [
+        [
+            InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ]
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     try:
         await query.message.edit_text(text, reply_markup=button)
@@ -230,11 +318,19 @@ async def reboot_bot(client, query):
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     text += "\n✅ Bot was restarted!"
-    list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")]]
+    list_button = [
+        [
+            InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ]
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     try:
         await query.message.edit_text(text, reply_markup=button)
@@ -257,15 +353,20 @@ async def reboot_heroku(client, query):
     text += "-> Assistant: `Running (v{})`\n".format(ASSISTANT_VERSION)
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
-    if not me:
-        togglestart = "Start Bot"
-    else:
-        togglestart = "Stop Bot"
-    list_button = [[InlineKeyboardButton(togglestart, callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")]]
+    togglestart = "Start Bot" if not me else "Stop Bot"
+    list_button = [
+        [
+            InlineKeyboardButton(togglestart, callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ]
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     if HEROKU_API is not None:
         text += "\nPlease wait..."
@@ -273,7 +374,9 @@ async def reboot_heroku(client, query):
             await query.message.edit_text(text, reply_markup=button)
         except errors.exceptions.bad_request_400.MessageNotModified:
             pass
-        await client.answer_callback_query(query.id, "Please wait for Heroku App restarting...")
+        await client.answer_callback_query(
+            query.id, "Please wait for Heroku App restarting..."
+        )
         heroku = heroku3.from_key(HEROKU_API)
         heroku_applications = heroku.apps()
         if len(heroku_applications) >= 1:
@@ -285,15 +388,23 @@ async def reboot_heroku(client, query):
         await query.message.edit_text(text, reply_markup=button)
     except errors.exceptions.bad_request_400.MessageNotModified:
         pass
-    await client.answer_callback_query(query.id, "No heroku application found, but a key given?")
+    await client.answer_callback_query(
+        query.id, "No heroku application found, but a key given?"
+    )
 
 
 @setbot.on_callback_query(dynamic_data_filter("heroku_vars"))
 async def vars_heroku(_client, query):
-    text = "**⚙️ Welcome to Heroku Vars Settings!**\n" \
-           "`Setting your heroku config vars here!`\n"
-    list_button = [[InlineKeyboardButton("⬅ back️", callback_data="back"),
-                    InlineKeyboardButton("➕  add️", callback_data="add_vars")]]
+    text = (
+        "**⚙️ Welcome to Heroku Vars Settings!**\n"
+        "`Setting your heroku config vars here!`\n"
+    )
+    list_button = [
+        [
+            InlineKeyboardButton("⬅ back️", callback_data="back"),
+            InlineKeyboardButton("➕  add️", callback_data="add_vars"),
+        ]
+    ]
     if HEROKU_API:
         heroku = heroku3.from_key(HEROKU_API)
         heroku_applications = heroku.apps()
@@ -306,7 +417,9 @@ async def vars_heroku(_client, query):
             #     list_button.insert(0, [InlineKeyboardButton("api_id🚫", callback_data="api_id")])
             configdict = config.to_dict()
             for x, _ in configdict.items():
-                list_button.insert(0, [InlineKeyboardButton("{}✅".format(x), callback_data="tes")])
+                list_button.insert(
+                    0, [InlineKeyboardButton("{}✅".format(x), callback_data="tes")]
+                )
     button = InlineKeyboardMarkup(list_button)
     await query.message.edit_text(text, reply_markup=button)
 
@@ -337,16 +450,22 @@ async def back(_client, message):
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     text += "\nJust setup what you need here"
-    if not me:
-        pass
-    else:
-        pass
-    list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")]]
+    list_button = [
+        [
+            InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ]
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")])
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     await message.message.edit_text(text, reply_markup=button)
 
@@ -380,13 +499,16 @@ async def get_stickers(_client, message):
         for y in x:
             TEMP_KEYBOARD.append(y)
     await app.send_message("@Stickers", "/cancel")
-    msg = await message.reply("Select your stickers for set as kang sticker",
-                              reply_markup=ReplyKeyboardMarkup(keyboard))
+    msg = await message.reply(
+        "Select your stickers for set as kang sticker",
+        reply_markup=ReplyKeyboardMarkup(keyboard),
+    )
     USER_SET[message.from_user.id] = msg.message_id
     USER_SET["type"] = 1
 
 
 # app.read_history("@Stickers")
+
 
 @setbot.on_message(Filters.user(AdminSettings) & Filters.command(["setanimation"]))
 async def get_stickers_animation(_client, message):
@@ -403,13 +525,16 @@ async def get_stickers_animation(_client, message):
         for y in x:
             TEMP_KEYBOARD.append(y)
     await app.send_message("@Stickers", "/cancel")
-    msg = await message.reply("Select your stickers for set as kang animation sticker",
-                              reply_markup=ReplyKeyboardMarkup(keyboard))
+    msg = await message.reply(
+        "Select your stickers for set as kang animation sticker",
+        reply_markup=ReplyKeyboardMarkup(keyboard),
+    )
     USER_SET[message.from_user.id] = msg.message_id
     USER_SET["type"] = 2
 
 
 # app.read_history("@Stickers")
+
 
 def get_stickerlist(message):
     if not DB_AVAILABLE:
@@ -435,12 +560,10 @@ async def set_stickers(client, message):
         elif USER_SET["type"] == 2:
             set_stanim_set(message.from_user.id, message.text)
         status = "Ok, sticker was set to `{}`".format(message.text)
-        TEMP_KEYBOARD = []
-        USER_SET = {}
     else:
         status = "Invalid pack selected."
-        TEMP_KEYBOARD = []
-        USER_SET = {}
+    USER_SET = {}
+    TEMP_KEYBOARD = []
     try:
         me = await app.get_me()
     except ConnectionError:
@@ -454,17 +577,23 @@ async def set_stickers(client, message):
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     text += "\n{}".format(status)
-    if not me:
-        pass
-    else:
-        pass
-    list_button = [[InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
-                    InlineKeyboardButton("Restart Bot", callback_data="restart_bot")],
-                   [InlineKeyboardButton("Set Sticker", callback_data="setsticker")]]
+    list_button = [
+        [
+            InlineKeyboardButton("Stop Bot", callback_data="toggle_startbot"),
+            InlineKeyboardButton("Restart Bot", callback_data="restart_bot"),
+        ],
+        [InlineKeyboardButton("Set Sticker", callback_data="setsticker")],
+    ]
     if HEROKU_API:
-        list_button.append([InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")])
-        list_button.append([InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")])
-        list_button.append([InlineKeyboardButton("Change Repo Source", callback_data="change_repo")])
+        list_button.append(
+            [InlineKeyboardButton("Heroku Config Vars", callback_data="heroku_vars")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Restart Heroku app", callback_data="restart_heroku")]
+        )
+        list_button.append(
+            [InlineKeyboardButton("Change Repo Source", callback_data="change_repo")]
+        )
     button = InlineKeyboardMarkup(list_button)
     await message.reply(text, reply_markup=button)
 
@@ -481,15 +610,21 @@ async def settings_sticker(_client, message):
     try:
         keyboard = await app.get_history("@Stickers", limit=1)
         keyboard = keyboard[0].reply_markup.keyboard
-    except:
-        message.message.edit_text("You dont have any sticker pack!\nAdd stickers pack in @Stickers ")
+    except Exception as e:
+        print(e)
+        message.message.edit_text(
+            "You dont have any sticker pack!\nAdd stickers pack in @Stickers "
+        )
         return
     for x in keyboard:
         for y in x:
             TEMP_KEYBOARD.append(y)
     await app.send_message("@Stickers", "/cancel")
     await message.message.delete()
-    msg = await setbot.send_message(Owner, "Select your stickers for set as kang animation sticker",
-                                    reply_markup=ReplyKeyboardMarkup(keyboard))
+    msg = await setbot.send_message(
+        Owner,
+        "Select your stickers for set as kang animation sticker",
+        reply_markup=ReplyKeyboardMarkup(keyboard),
+    )
     USER_SET[message.from_user.id] = msg.message_id
     USER_SET["type"] = 2

@@ -29,10 +29,7 @@ async def tfsh(client, message):
     await message.edit("`Processing...`")
     name = await name_file(client, message)
     await download_file_from_tg(client, message)
-    if len(name) > 10:
-        name_file_upload = name[-10:]
-    else:
-        name_file_upload = name
+    name_file_upload = name[-10:] if len(name) > 10 else name
     name_file_upload.encode('ascii', 'ignore')
     os.rename(r'nana/downloads/{}'.format(name), r'nana/downloads/{}'.format(name_file_upload))
     print(name_file_upload)
@@ -43,12 +40,7 @@ async def tfsh(client, message):
 
 
 async def send_to_transfersh(file, message, name):
-    """
-    send file to transfersh, retrieve download link, and copy it to clipboard
-    :param file: absolute path to file
-    :param message: a message atribute
-    :return: download_link
-    """
+    """send file to transfersh, retrieve download link"""
     size_of_file = get_size(file)
     final_date = get_date_in_two_weeks()
     file_name = os.path.basename(file)

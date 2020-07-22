@@ -18,18 +18,16 @@ Reply to any photo to set as pfp
 -> `vpfp`
 View current pfp of user
 
--> `clone`
-clone user identity without original backup
+──「 **Cloner** 」──
+-> `clone` or `revert`
+clone user identity or revert to original identity
 
 -> `clone origin`
 clone user identity with original backup
 
--> `revert`
-revert to original identity
-
 ──「 **Group** 」──
 -> `join <groupname>`
-joins a groupchat // Note: join works in public chats only
+joins a public groupchat
 
 -> `leave`
 Leave chat
@@ -48,6 +46,27 @@ Forward a message into Saved Messages
 """
 
 profile_photo = "nana/downloads/pfp.jpg"
+
+
+@app.on_message(Filters.me & Filters.command(["e", "edit"], Command))
+async def edit_text(client, message):
+    cmd = message.command
+    teks = ""
+    if len(cmd) > 1:
+        teks = " ".join(cmd[1:])
+    rep = message.reply_to_message
+    if rep.text:
+        await message.delete()
+        await client.edit_message_text(message.chat.id, message.reply_to_message.message_id, teks)
+        return
+    elif rep.photo or rep.video or rep.audio or rep.voice or rep.sticker or rep.animation:
+        await message.delete()
+        await client.edit_message_caption(message.chat.id, message.reply_to_message.message_id, teks)
+    else:
+        await message.edit('`reply to a message to edit caption`')
+        await sleep(3)
+        await message.delete()
+
 
 
 @app.on_message(Filters.me & Filters.command("setpfp", Command))
@@ -150,7 +169,7 @@ async def join_chat(client, message):
         text = " ".join(cmd[1:])
     elif message.reply_to_message and len(cmd) == 1:
         text = message.reply_to_message.text
-    elif not message.reply_to_message and len(cmd) == 1:
+    elif len(cmd) == 1:
         await message.edit("`cant join the void.`")
         await sleep(2)
         await message.delete()
@@ -165,7 +184,7 @@ async def join_chat(client, message):
 async def leave_chat(client, message):
     await message.edit('__adios__')
     await client.leave_chat(message.chat.id)
-    
+
 
 @app.on_message(Filters.command('unread', Command) & Filters.me)
 async def mark_chat_unread(client, message):
