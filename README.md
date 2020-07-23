@@ -17,7 +17,9 @@ community will answer you some questions.
 
 ## Credits
 
-- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot) by @raphielscape and the @RaphielGang squad.
+- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot) by [Raphiel Rollerscaperers](https://github.com/raphielscape) and the [Devscapes squad].
 - [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended) by @AvinashReddy3108
 - [Ayra Hikari](https://github.com/AyraHikari)
 - [LegenHand](https://github.com/legenhand)
+
+[Devscapes squad]: https://github.com/RaphielGang
