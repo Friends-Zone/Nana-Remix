@@ -52,8 +52,10 @@ async def change_repo(url):
 async def configrepo():
     cache_path = "nana/cache/repo.json"
     if not os.path.exists(cache_path):
-        # If problem presists, edit your code and point to https://raw.githubusercontent.com/legenhand/Nana-bot-file/master/config/repo.json.
-        config_url = "https://gitlab.com/EagleUnion/Nana-Userbot-Repository-Database/-/raw/master/config/repo.json"
+        # It was originally https://gitlab.com/EagleUnion/Nana-Userbot-Repository-Database/-/raw/master/config/repo.json
+        # But it doesn't work in Heroku because of Cloudflare.
+        # So I place it in an GitHub Gist instead. Please comment there if any changes happens.
+        config_url = "https://gist.githubusercontent.com/AndreiJirohHaliliDev2006/b2e7f3c93aa44bf4810cfd6dba7d8541/raw/d985279c9416b4d3ec02bef663d4a91b2b25cbdb/repo.json"
         urllib.request.urlretrieve(config_url, cache_path)
     f = open("nana/cache/repo.json")
     data_repo = json.load(f)
@@ -106,18 +108,18 @@ async def selectversion(_client, query):
     repo_docker = rp[repo_name]["version"][ver]["dockerfile"]
     text = "**⚙️ Repository Configuration **\n" \
            "`description : {} `\n".format(desc)
-    text += "** Warning ! **" \
-            "This Feature still experimental! \n " \
+    text += "** Warning! **" \
+            "This feature is still experimental! \n " \
             "Your bot might broken after change repo \n" \
             "Use at your own risk! "
-    list_button.append([InlineKeyboardButton("Yes️", callback_data="chg_repo")])
-    list_button.append([InlineKeyboardButton("⬅ back️", callback_data="change_repo")])
+    list_button.append([InlineKeyboardButton("Agree and Continue", callback_data="chg_repo")])
+    list_button.append([InlineKeyboardButton("⬅ Return to the list", callback_data="change_repo")])
     button = InlineKeyboardMarkup(list_button)
     await query.message.edit_text(text, reply_markup=button)
 
 @setbot.on_callback_query(Filters.regex("chg_repo"))
 async def select_version(_client, query):
     global repo_docker
-    text = "Repo Changed! It will take up to 5 minutes, Please Wait...."
+    text = "Repo Changed! Please wait for up to 5 minutes to finish the post-repo change setup.."
     await query.message.edit_text(text)
     await change_repo(repo_docker)
