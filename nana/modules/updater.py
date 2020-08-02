@@ -6,9 +6,10 @@ from git import Repo
 from git.exc import InvalidGitRepositoryError, GitCommandError, NoSuchPathError
 from pyrogram import Filters
 
-from nana import app, Command, OFFICIAL_BRANCH, REPOSITORY, HEROKU_API
+from nana import app, Command, OFFICIAL_BRANCH, REPOSITORY, HEROKU_API, AdminSettings
 from nana.__main__ import restart_all, except_hook
 from nana.assistant.updater import update_changelog
+from nana.helpers.PyroHelpers import msg
 
 __MODULE__ = "Updater"
 __HELP__ = """
@@ -54,24 +55,23 @@ async def initial_git(repo):
 
 @app.on_message(Filters.me & Filters.command("update", Command))
 async def updater(client, message):
-    await message.edit("__Checking update...__")
+    await msg(message, text="__Checking update...__")
     initial = False
     try:
         repo = Repo()
     except NoSuchPathError as error:
-        await message.edit(f"**Update failed!**\n\nError:\n`directory {error} is not found`")
+        await msg(message, text=f"**Update failed!**\n\nError:\n`directory {error} is not found`")
         return
     except InvalidGitRepositoryError:
         repo = Repo.init()
         initial = True
     except GitCommandError as error:
-        await message.edit(f'**Update failed!**\n\nError:\n`{error}`')
+        await msg(message, text=f'**Update failed!**\n\nError:\n`{error}`')
         return
 
     if initial:
         if len(message.text.split()) != 2:
-            await message.edit(
-                'Your git workdir is missing!\nBut i can repair and take new latest update for you.\nJust do `update '
+            await msg(message, text='Your git workdir is missing!\nBut i can repair and take new latest update for you.\nJust do `update '
                 'now` to repair and take update!')
             return
         elif len(message.text.split()) == 2 and message.text.split()[1] == "now":
@@ -79,19 +79,18 @@ async def updater(client, message):
                 await initial_git(repo)
             except Exception as err:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
-                await message.edit(f'**Error:**\n{err}')
+                await msg(message, text=f'**Error:**\n{err}')
                 await except_hook(exc_type, exc_obj, exc_tb)
                 return
-            await message.edit('Successfully Updated!\nBot is restarting...')
+            await msg(message, text='Successfully Updated!\nBot is restarting...')
             await update_changelog(
-                "-> **WARNING**: Bot has been created a new git and sync to latest version, your old files is in "
-                "nana-old")
+                "-> **WARNING**: Bot has been created a new git and sync to latest version, your old files is in nana-old")
             await restart_all()
             return
 
     brname = repo.active_branch.name
     if brname not in OFFICIAL_BRANCH:
-        await message.edit(f'**[UPDATER]:** Looks like you are using your own custom branch ({brname}). in that case, Updater is unable to identify which branch is to be merged. please checkout to any official branch')
+        await msg(message, text=f'**[UPDATER]:** Looks like you are using your own custom branch ({brname}). in that case, Updater is unable to identify which branch is to be merged. please checkout to any official branch')
         return
     try:
         repo.create_remote('upstream', REPOSITORY)
@@ -108,29 +107,27 @@ async def updater(client, message):
                 await initial_git(repo)
             except Exception as err:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
-                await message.edit(f'**Error:**\n{err}')
+                await msg(message, text=f'**Error:**\n{err}')
                 await except_hook(exc_type, exc_obj, exc_tb)
                 return
-            await message.edit('Successfully Updated!\nBot is restarting...')
-            await update_changelog(
-                "-> **WARNING**: Bot has been created a new git and sync to latest version, your old files is in "
-                "nana-old")
+            await msg(message, text='Successfully Updated!\nBot is restarting...')
+            await update_changelog("-> **WARNING**: Bot has been created a new git and sync to latest version, your old files is in nana-old")
             await restart_all()
             return
         exc_type, exc_obj, exc_tb = sys.exc_info()
-        await message.edit('An error has accured!\nPlease see your Assistant for more information!')
+        await msg(message, text='An error has accured!\nPlease see your Assistant for more information!')
         await except_hook(exc_type, exc_obj, exc_tb)
         return
 
     if not changelog:
-        await message.edit(f'Nana is up-to-date with branch **{brname}**\n')
+        await msg(message, text=f'Nana is up-to-date with branch **{brname}**\n')
         return
 
     if len(message.text.split()) != 2:
         changelog_str = f'To update latest changelog, do\n-> `update now`\n\n**New UPDATE available for [{brname}]:\n' \
                         f'\nCHANGELOG:**\n`{changelog}` '
         if len(changelog_str) > 4096:
-            await message.edit("`Changelog is too big, view the file to see it.`")
+            await msg(message, text="`Changelog is too big, view the file to see it.`")
             file = open("nana/cache/output.txt", "w+")
             file.write(changelog_str)
             file.close()
@@ -138,10 +135,10 @@ async def updater(client, message):
                                        caption="`Changelog file`")
             os.remove("nana/cache/output.txt")
         else:
-            await message.edit(changelog_str)
+            await msg(message, text=changelog_str)
         return
     elif len(message.text.split()) == 2 and message.text.split()[1] == "now":
-        await message.edit('`New update found, updating...`')
+        await msg(message, text='`New update found, updating...`')
         if HEROKU_API is not None:
             import heroku3
             heroku = heroku3.from_key(HEROKU_API)
@@ -160,20 +157,18 @@ async def updater(client, message):
                 remote.push(refspec="HEAD:refs/heads/master")
             else:
                 await message.reply("no heroku application found, but a key given? 😕 ")
-            await message.edit("Build Unsuccess, Check heroku build log for more detail")
+            await msg(message, text="Build Unsuccess, Check heroku build log for more detail")
             return
         try:
             upstream.pull(brname)
-            await message.edit('Successfully Updated!\nBot is restarting...')
+            await msg(message, text='Successfully Updated!\nBot is restarting...')
         except GitCommandError:
             repo.git.reset('--hard')
             repo.git.clean('-fd', 'nana/modules/')
             repo.git.clean('-fd', 'nana/assistant/')
             repo.git.clean('-fd', 'nana/helpers/')
-            await message.edit('Successfully Updated!\nBot is restarting...')
+            await msg(message, text='Successfully Updated!\nBot is restarting...')
         await update_changelog(changelog)
         await restart_all()
     else:
-        await message.edit(
-            "Usage:\n-> `update` to check update\n-> `update now` to update latest commits\nFor more information "
-            "check at your Assistant")
+        await msg(message, text="Usage:\n-> `update` to check update\n-> `update now` to update latest commits\nFor more information ")
