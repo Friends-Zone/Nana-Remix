@@ -8,12 +8,13 @@ Currently work fine perfectly, but some features may give you error. Please repo
 
 ## Installation Guide
 
-[Visit the documentation](https://aman-a.gitbook.io/nana-remix) o learn more how to setup your own Nana userbot + assistant.
+[Visit the official documentation](https://aman-a.gitbook.io/nana-remix) to learn more how to setup your own Nana userbot + assistant.
 
 ## Community
 
-Have questions about Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly
-community will answer you some questions.
+Have questions about our fork of Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly
+community will answer you some questions. If you referring to our our fork, please mention [Andrei Jiroh](https://t.me/AJHalili2006)
+and he'll help you fix your problem.
 
 ## Credits
 

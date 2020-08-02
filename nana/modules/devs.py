@@ -219,12 +219,12 @@ async def alive(_client, message):
     repo = git.Repo(os.getcwd())
     master = repo.head.reference
     commit_id = master.commit.hexsha
-    commit_link = f"<a href='https://github.com/pokurt/Nana-Remix/commit/{commit_id}'>{commit_id[:7]}</a>"
+    commit_link = f"<a href='https://github.com/MadeByThePinsHub/Nana-Remix/commit/{commit_id}'>{commit_id[:7]}</a>"
     try:
         me = await app.get_me()
     except ConnectionError:
         me = None
-    text = f"**[Nana-Remix](https://github.com/pokurt/Nana-Remix) Running on {commit_link}:**\n"
+    text = f"**[Nana-Remix-AJHalili2006](https://github.com/MadeByThePinsHub/Nana-Remix) Running on {commit_link}:**\n"
     if not me:
         text += f" - **Bot**: `stopped (v{USERBOT_VERSION})`\n"
     else:
