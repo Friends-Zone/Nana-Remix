@@ -6,7 +6,7 @@ from uuid import uuid4
 from pyrogram import InlineQueryResultArticle
 from pyrogram import errors, InlineKeyboardMarkup, InputTextMessageContent, InlineKeyboardButton
 
-from nana import setbot, Owner, OwnerName, DB_AVAILABLE
+from nana import setbot, Owner, OwnerName, DB_AVAILABLE, AdminSettings
 from nana.helpers.msg_types import Types
 from nana.helpers.string import parse_button, build_keyboard
 from nana.modules.pm import welc_txt
@@ -224,7 +224,6 @@ async def inline_query_handler(client, query):
                                          switch_pm_text="Converted to stylish text",
                                          switch_pm_parameter="help_inline"
                                          )
-        return
 
     # PM_PERMIT
     elif string.split()[0] == "engine_pm":
@@ -243,3 +242,20 @@ async def inline_query_handler(client, query):
                                          results=answers,
                                          cache_time=0
                                          )
+
+    elif string.split()[0] == "speedtest":
+        buttons = [[InlineKeyboardButton("Image",
+                                        callback_data="speedtest_image"),
+                    InlineKeyboardButton("Text",
+                                        callback_data="speedtest_text")]]
+        answers.append(InlineQueryResultArticle(
+            id=uuid4(),
+            title="Speed Test",
+            description="test your speed",
+            input_message_content=InputTextMessageContent("Select SpeedTest Mode", parse_mode="markdown"),
+            reply_markup=InlineKeyboardMarkup(buttons)))
+        await client.answer_inline_query(query.id,
+                                         results=answers,
+                                         cache_time=0
+                                         )
+        return
