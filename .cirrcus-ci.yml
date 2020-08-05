@@ -1,0 +1,15 @@
+docker_builder:
+  name: Build Docker image
+  timeout_in: 100m
+  only_if: $CIRRUS_BRANCH == "master" && $CIRRUS_REPO_OWNER == "MadeByThePinsHub"
+  auto_cancellation: $CIRRUS_BRANCH != 'master'
+  env:
+    # For forks, change this var into your own Docker Hub username, must be an service account.
+    DOCKERHUB_USERNAME: thepinsteam
+    # Only repos that are owned by the Pins team can use the access key.
+    # Please generate a new encrypted var on https://cirrus-ci.com/settings/github/your-username-here and
+    # replace the value below with yours.
+    DOCKERHUB_ACCESS_KEY: ENCRYPTED[!e15bc943a38e23531fd9f7729d3a0f51bf38ea1e15c081b93b5685a6ffe576375154eee1e716c595ac2f076e38c40433!]
+  build_image: docker build --tag thepinsteam/nana-remix .
+  login_to_registry: docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_ACCESS_KEY
+  publish_image: docker push thepinsteam/nana-remix
