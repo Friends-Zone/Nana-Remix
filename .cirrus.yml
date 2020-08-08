@@ -1,6 +1,6 @@
 docker_builder:
   name: Build and push Docker image to Docker Hub
-  timeout_in: 100m
+  timeout_in: 95m
   only_if: $CIRRUS_BRANCH == "master" && $CIRRUS_REPO_OWNER == "MadeByThePinsHub"
   skip: "!changesInclude('.cirrus.yml', '**.{py}', 'Dockerfile')"
   env:
@@ -16,7 +16,7 @@ docker_builder:
 
 docker_builder:
   name: Only build Docker image
-  timeout: 90m
+  timeout_in: 95m
   only_if: $CIRRUS_BRANCH != "master"
   skip: "!changesInclude('.cirrus.yml', '**.{py}', 'Dockerfile')"
   build_script: docker build --tag thepinsteam/nana-remix:TEST-BUILDS .
