@@ -10,6 +10,10 @@ Currently work fine perfectly, but some features may give you error. Please repo
 
 [Visit the official documentation](https://aman-a.gitbook.io/nana-remix) to learn more how to setup your own Nana userbot + assistant.
 
+## Commands List
+
+TO get all the available commands for the userbot + assistant, send `/help` on your Assistant.
+
 ## Community
 
 Have questions about our fork of Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly
@@ -18,7 +22,7 @@ and he'll help you fix your problem.
 
 ## Credits
 
-- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot) by @raphielscape and the @RaphielGang squad.
-- [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended) by @AvinashReddy3108
+- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot)
+- [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended)
 - [Ayra Hikari](https://github.com/AyraHikari)
 - [LegenHand](https://github.com/legenhand)
