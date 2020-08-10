@@ -114,7 +114,7 @@ Convert a text to various style, can be used anywhere!
         await setbot.send_message(Owner, start_message, reply_markup=buttons)
 
 
-@setbot.on_message(Filters.user(AdminSettings) & Filters.command(["getme"]))
+@setbot.on_message(Filters.user(Owner) & Filters.command(["getme"]))
 async def get_myself(client, message):
     try:
         me = await app.get_me()
@@ -145,7 +145,7 @@ async def get_myself(client, message):
 
 
 @setbot.on_message(
-    Filters.user(AdminSettings) & Filters.command(["settings"]) & Filters.private
+    Filters.user(Owner) & Filters.command(["settings"]) & Filters.private
 )
 async def settings(_client, message):
     try:
@@ -409,8 +409,8 @@ async def vars_heroku(_client, query):
         heroku = heroku3.from_key(HEROKU_API)
         heroku_applications = heroku.apps()
         if len(heroku_applications) >= 1:
-            app = heroku_applications[0]
-            config = app.config()
+            applic = heroku_applications[0]
+            config = applic.config()
             # if config["api_id"]:
             #     list_button.insert(0, [InlineKeyboardButton("api_id✅", callback_data="api_id")])
             # else:

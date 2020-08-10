@@ -2,6 +2,7 @@
 FROM python:3.8.4-slim-buster
 
 ENV PIP_NO_CACHE_DIR 1
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN sed -i.bak 's/us-west-2\.ec2\.//' /etc/apt/sources.list
 
@@ -62,8 +63,7 @@ RUN apt update && apt upgrade -y && \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives /tmp
 
 # Pypi package Repo upgrade
-RUN pip3 install --upgrade pip setuptools
-
+RUN pip3 install --upgrade pip setuptools wheel
 
 # Copy Python Requirements to /root/nana
 RUN git clone https://github.com/pokurt/Nana-Remix /root/nana

@@ -1,0 +1,10 @@
+version: "1"
+rules:
+  - base: master # The default branch.
+    upstream: pokurt:master # Points to the upstream repository
+    mergeMethod: merge # Don't hardreset to avoid the loss of my commits.
+    assignees:
+      - ThePinsTeam
+    reviewers:
+      - AndreiJirohHaliliDev2006
+label: ":arrow_heading_down: pull"

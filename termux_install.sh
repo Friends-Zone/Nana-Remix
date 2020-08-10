@@ -1,7 +1,8 @@
 # This is for Termux only
-echo Nana-Remix install for Termux
-echo Written by @pokurt
-echo Beginning dependency installation in 5 seconds....
+
+echo "Nana-Remix install for Termux"
+echo "Written by @pokurt"
+echo "Beginning installation of dependencies in 5 seconds...."
 #!/bin/bash
 sleep 5
 apt update
@@ -14,5 +15,5 @@ cd nana
 mv config.example.py config.py
 cd ..
 echo Done.
-echo Now edit config.py with nano or anything you want, then run the userbot with py -m nana.
+echo "Now edit config.py with nano or anything you want, then run the userbot with py -m nana."
 echo Good luck!

@@ -1,5 +1,4 @@
 import os
-import git
 import re
 import shutil
 import subprocess
@@ -9,13 +8,13 @@ from platform import python_version
 
 import requests
 from pyrogram import Filters
-from speedtest import Speedtest
 import pyrogram as p
 
-from nana import Command, logging, app, DB_AVAILABLE, USERBOT_VERSION
+from nana import Command, logging, app
 from nana.helpers.deldog import deldog
 from nana.helpers.parser import mention_markdown
 from nana.helpers.aiohttp_helper import AioHttp
+from nana.helpers.PyroHelpers import msg
 
 __MODULE__ = "Devs"
 __HELP__ = """
@@ -55,8 +54,8 @@ Send id of what you replied to
 async def stk(chat, photo):
     if "http" in photo:
         r = requests.get(photo, stream=True)
-        with open("nana/cache/stiker.png", "wb") as stk:
-            shutil.copyfileobj(r.raw, stk)
+        with open("nana/cache/stiker.png", "wb") as stikr:
+            shutil.copyfileobj(r.raw, stikr)
         await app.send_sticker(chat, "nana/cache/stiker.png")
         os.remove("nana/cache/stiker.png")
     else:
@@ -85,7 +84,7 @@ async def aexec(client, message, code):
 @app.on_message(Filters.me & Filters.command("py", Command))
 async def executor(client, message):
     if len(message.text.split()) == 1:
-        await message.edit("Usage: `py await message.edit('edited!')`")
+        await msg(message, text="Usage: `py await msg(message, text='edited!')`")
         return
     args = message.text.split(None, 1)
     code = args[1]
@@ -95,7 +94,7 @@ async def executor(client, message):
         print(e)
         exc_type, exc_obj, exc_tb = sys.exc_info()
         errors = traceback.format_exception(etype=exc_type, value=exc_obj, tb=exc_tb)
-        await message.edit("**Execute**\n`{}`\n\n**Failed:**\n```{}```".format(code, "".join(errors)))
+        await msg(message, text="**Execute**\n`{}`\n\n**Failed:**\n```{}```".format(code, "".join(errors)))
         logging.exception("Execution error")
 
 
@@ -110,14 +109,14 @@ async def public_ip(_client, message):
     stats += f"**Lattitude:** `{j['lat']}`\n"
     stats += f"**Longitude:** `{j['lon']}`\n"
     stats += f"**Time Zone:** `{j['timezone']}`"
-    await message.edit(stats, parse_mode='markdown')
+    await msg(message, text=stats, parse_mode='markdown')
 
 
 
 @app.on_message(Filters.me & Filters.command("sh", Command))
 async def terminal(client, message):
     if len(message.text.split()) == 1:
-        await message.edit("Usage: `sh ping -c 5 google.com`")
+        await msg(message, text="Usage: `sh ping -c 5 google.com`")
         return
     args = message.text.split(None, 1)
     teks = args[1]
@@ -134,7 +133,7 @@ async def terminal(client, message):
                 )
             except Exception as err:
                 print(err)
-                await message.edit("""
+                await msg(message, text="""
 **Input:**
 ```{}```
 
@@ -157,7 +156,7 @@ async def terminal(client, message):
         except Exception as err:
             exc_type, exc_obj, exc_tb = sys.exc_info()
             errors = traceback.format_exception(etype=exc_type, value=exc_obj, tb=exc_tb)
-            await message.edit("""**Input:**\n```{}```\n\n**Error:**\n```{}```""".format(teks, "".join(errors)))
+            await msg(message, text="""**Input:**\n```{}```\n\n**Error:**\n```{}```""".format(teks, "".join(errors)))
             return
         output = process.stdout.read()[:-1].decode("utf-8")
     if str(output) == "\n":
@@ -171,20 +170,20 @@ async def terminal(client, message):
                                        caption="`Output file`")
             os.remove("nana/cache/output.txt")
             return
-        await message.edit("""**Input:**\n```{}```\n\n**Output:**\n```{}```""".format(teks, output))
+        await msg(message, text="""**Input:**\n```{}```\n\n**Output:**\n```{}```""".format(teks, output))
     else:
-        await message.edit("**Input: **\n`{}`\n\n**Output: **\n`No Output`".format(teks))
+        await msg(message, text="**Input: **\n`{}`\n\n**Output: **\n`No Output`".format(teks))
 
 
 @app.on_message(Filters.me & Filters.command(["log"], Command))
 async def log(_client, message):
     f = open("nana/logs/error.log", "r")
     data = await deldog(message, f.read())
-    await message.edit("`Your recent logs stored here : `{}".format(data))
+    await msg(message, text=f"`Your recent logs stored here : `{data}")
 
 
 @app.on_message(Filters.me & Filters.command("dc", Command))
-async def dc_id(_client, message):
+async def dc_id_check(_client, message):
     user = message.from_user
     if message.reply_to_message:
         if message.reply_to_message.forward_from:
@@ -210,28 +209,8 @@ async def dc_id(_client, message):
         text = "{}'s assigned datacenter is **DC5**, located in **SIN, Singapore, SG**".format(user)
     else:
         text = "{}'s assigned datacenter is **Unknown**".format(user)
-    await message.edit(text)
+    await msg(message, text=text)
 
-
-@app.on_message(Filters.me & Filters.command("alive", Command))
-async def alive(_client, message):
-    repo = git.Repo(os.getcwd())
-    master = repo.head.reference
-    commit_id = master.commit.hexsha
-    commit_link = f"<a href='https://github.com/pokurt/Nana-Remix/commit/{commit_id}'>{commit_id[:7]}</a>"
-    try:
-        me = await app.get_me()
-    except ConnectionError:
-        me = None
-    text = f"**[Nana-Remix](https://github.com/pokurt/Nana-Remix) Running on {commit_link}:**\n"
-    if not me:
-        text += f" - **Bot**: `stopped (v{USERBOT_VERSION})`\n"
-    else:
-        text += f" - **Bot**: `alive (v{USERBOT_VERSION})`\n"
-    text += f" - **Pyrogram**: `{p.__version__}`\n"
-    text += f" - **Python**: `{python_version()}`\n"
-    text += f" - **Database**: `{DB_AVAILABLE}`\n"
-    await message.edit(text, disable_web_page_preview=True)
 
 @app.on_message(Filters.me & Filters.command("id", Command))
 async def get_id(_client, message):
@@ -298,7 +277,7 @@ async def get_id(_client, message):
         else:
             user_detail = f"**User ID**: `{message.reply_to_message.from_user.id}`\n"
         user_detail += f"**Message ID**: `{message.reply_to_message.message_id}`"
-        await message.edit(user_detail)
+        await msg(message, text=user_detail)
     elif file_id:
         if rep.forward_from:
             user_detail = f"**Forwarded User ID**: `{message.reply_to_message.forward_from.id}`\n"
@@ -306,40 +285,6 @@ async def get_id(_client, message):
             user_detail = f"**User ID**: `{message.reply_to_message.from_user.id}`\n"
         user_detail += f"**Message ID**: `{message.reply_to_message.message_id}`\n\n"
         user_detail += file_id
-        await message.edit(user_detail)
+        await msg(message, text=user_detail)
     else:
-        await message.edit(f"**Chat ID**: `{message.chat.id}`")
-
-
-@app.on_message(Filters.me & Filters.command("speedtest", Command))
-async def speedtest(_client, message):
-    await message.edit("`Running speed test . . .`")
-    test = Speedtest()
-    test.get_best_server()
-    test.download()
-    test.upload()
-    test.results.share()
-    result = test.results.dict()
-    await message.edit("`"
-                       "Started at "
-                       f"{result['timestamp']} \n\n"
-                       "Download "
-                       f"{speed_convert(result['download'])} \n"
-                       "Upload "
-                       f"{speed_convert(result['upload'])} \n"
-                       "Ping "
-                       f"{result['ping']} \n"
-                       "ISP "
-                       f"{result['client']['isp']}"
-                       "`")
-
-
-def speed_convert(size):
-    """Hi human, you can't read bytes?"""
-    power = 2 ** 10
-    zero = 0
-    units = {0: '', 1: 'Kb/s', 2: 'Mb/s', 3: 'Gb/s', 4: 'Tb/s'}
-    while size > power:
-        size /= power
-        zero += 1
-    return f"{round(size, 2)} {units[zero]}"
+        await msg(message, text=f"**Chat ID**: `{message.chat.id}`")

@@ -79,7 +79,7 @@ if ENV:
     except AttributeError:
         pass
 
-    # APIs
+    # API Keys for different services
     thumbnail_API = os.environ.get('thumbnail_API', None)
     screenshotlayer_API = os.environ.get('screenshotlayer_API', None)
     bitly_token = [os.environ.get('bitly_token', None)]
@@ -87,9 +87,13 @@ if ENV:
     lydia_api = os.environ.get('lydia_api', None)
     remove_bg_api = os.environ.get('remove_bg_api', None)
     sw_api = os.environ.get('sw_api', None)
-    HEROKU_API = os.environ.get('HEROKU_API', None)
     IBM_WATSON_CRED_URL = os.environ.get('IBM_WATSON_CRED_URL', None)
     IBM_WATSON_CRED_PASSWORD = os.environ.get('IBM_WATSON_CRED_PASSWORD', None)
+
+    # Heroku API for Updater
+    HEROKU_API = os.environ.get('HEROKU_API', None)
+    HEROKU_APP_NAME = os.environ.get('HEROKU_APP_NAME', None)
+
     # LOADER
     USERBOT_LOAD = os.environ.get("USERBOT_LOAD", "").split()
     USERBOT_NOLOAD = os.environ.get("USERBOT_NOLOAD", "").split()

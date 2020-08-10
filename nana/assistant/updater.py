@@ -15,7 +15,7 @@ from nana import (
     REMINDER_UPDATE,
     TEST_DEVELOP,
     HEROKU_API,
-    DB_AVAILABLE,
+    HEROKU_APP_NAME
 )
 from nana.__main__ import restart_all, loop
 
@@ -127,7 +127,7 @@ async def update_button(client, query):
         heroku = heroku3.from_key(HEROKU_API)
         heroku_applications = heroku.apps()
         if len(heroku_applications) >= 1:
-            heroku_app = heroku_applications[0]
+            heroku_app = HEROKU_APP_NAME
             heroku_git_url = heroku_app.git_url.replace(
                 "https://", "https://api:" + HEROKU_API + "@"
             )
