@@ -69,12 +69,7 @@ RUN pip3 install --upgrade pip setuptools wheel
 RUN git clone https://github.com/AndreiJirohHaliliDev2006/Nana-Remix /app
 WORKDIR /app
 
-#Copy config file to /root/nana/nana
-COPY ./nana/config.example.py ./nana/config.py* /app/nana
-
-#Copy credentials google drive to /root/nana
-COPY ./README.md ./client_secrets.json* /app/nana
-
+# Update Path
 ENV PATH="/home/userbot/bin:$PATH"
 
 # Install requirements
