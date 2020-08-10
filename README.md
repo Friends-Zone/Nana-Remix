@@ -16,9 +16,10 @@ TO get all the available commands for the userbot + assistant, send `/help` on y
 
 ## Community
 
-Have questions about our fork of Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly
-community will answer you some questions. If you referring to our our fork, please mention [Andrei Jiroh](https://t.me/AJHalili2006)
-and he'll help you fix your problem.
+Have questions about our fork of Nana or facing issues? Join [Nana Support](https://t.me/NanaBotSupport) and our friendly community will answer you some questions.
+
+For support to the forks you're using, please refer to their documentation or if they're in the support chat,
+please mention them about your issue.
 
 ## Credits
 
@@ -26,4 +27,3 @@ and he'll help you fix your problem.
 - [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended)
 - [Ayra Hikari](https://github.com/AyraHikari)
 - [LegenHand](https://github.com/legenhand)
-
