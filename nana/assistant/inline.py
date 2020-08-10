@@ -2,14 +2,18 @@ import sys
 import traceback
 import random
 from uuid import uuid4
-
-from pyrogram import InlineQueryResultArticle
+import requests
+import git
+import os
+from pyrogram import InlineQueryResultArticle, __version__, InlineQueryResultPhoto
 from pyrogram import errors, InlineKeyboardMarkup, InputTextMessageContent, InlineKeyboardButton
+from platform import python_version
 
-from nana import setbot, Owner, OwnerName, DB_AVAILABLE, AdminSettings
+from nana import setbot, Owner, OwnerName, DB_AVAILABLE, app, USERBOT_VERSION
 from nana.helpers.msg_types import Types
 from nana.helpers.string import parse_button, build_keyboard
 from nana.modules.pm import welc_txt
+from nana.modules.animelist import url, anime_query, shorten
 from nana.modules.stylish import text_style_generator, formatting_text_inline, CHAR_OVER, \
     CHAR_UNDER, CHAR_STRIKE, graffiti, graffitib, CHAR_POINTS, upsidedown_text_inline, smallcaps, superscript, \
     subscript, wide, bubbles, bubblesblack, smothtext, handwriting, handwritingb
@@ -22,7 +26,7 @@ if DB_AVAILABLE:
 GET_FORMAT = {
     Types.TEXT.value: InlineQueryResultArticle,
     # Types.DOCUMENT.value: InlineQueryResultDocument,
-    # Types.PHOTO.value: InlineQueryResultPhoto,
+    Types.PHOTO.value: InlineQueryResultPhoto,
     # Types.VIDEO.value: InlineQueryResultVideo,
     # Types.STICKER.value: InlineQueryResultCachedSticker,
     # Types.AUDIO.value: InlineQueryResultAudio,
@@ -258,4 +262,86 @@ async def inline_query_handler(client, query):
                                          results=answers,
                                          cache_time=0
                                          )
+    elif string.split()[0] == "alive":
+        repo = git.Repo(os.getcwd())
+        master = repo.head.reference
+        commit_id = master.commit.hexsha
+        commit_link = f"[{commit_id[:7]}](https://github.com/pokurt/Nana-Remix/commit/{commit_id})"
+        try:
+            me = await app.get_me()
+        except ConnectionError:
+            me = None
+        text = f"**[Nana-Remix](https://github.com/pokurt/Nana-Remix) Running on {commit_link}:**\n"
+        if not me:
+            text += f" - **Bot**: `stopped (v{USERBOT_VERSION})`\n"
+        else:
+            text += f" - **Bot**: `alive (v{USERBOT_VERSION})`\n"
+        text += f" - **Pyrogram**: `{__version__}`\n"
+        text += f" - **Python**: `{python_version()}`\n"
+        text += f" - **Database**: `{DB_AVAILABLE}`\n"
+        buttons = [[InlineKeyboardButton("stats", callback_data="alive_message")]]
+        answers.append(InlineQueryResultArticle(
+            id=uuid4(),
+            title="Alive",
+            description="Nana Userbot",
+            input_message_content=InputTextMessageContent(text, parse_mode="markdown", disable_web_page_preview=True),
+            reply_markup=InlineKeyboardMarkup(buttons)))
+        await client.answer_inline_query(query.id,
+                                         results=answers,
+                                         cache_time=0
+                                         )
+    elif string.split()[0] == "anime":
+        search = string.split(None, 1)[1]
+        variables = {'search' : search}
+        json = requests.post(url, json={'query': anime_query, 'variables': variables}).json()['data'].get('Media', None)
+        if json:
+            msg = f"**{json['title']['romaji']}** (`{json['title']['native']}`)\n**Type**: {json['format']}\n**Status**: {json['status']}\n**Episodes**: {json.get('episodes', 'N/A')}\n**Duration**: {json.get('duration', 'N/A')} Per Ep.\n**Score**: {json['averageScore']}\n**Genres**: `"
+            for x in json['genres']: 
+                msg += f"{x}, "
+            msg = msg[:-2] + '`\n'
+            msg += "**Studios**: `"
+            for x in json['studios']['nodes']:
+                msg += f"{x['name']}, " 
+            msg = msg[:-2] + '`\n'
+            info = json.get('siteUrl')
+            trailer = json.get('trailer', None)
+            if trailer:
+                trailer_id = trailer.get('id', None)
+                site = trailer.get('site', None)
+                if site == "youtube": trailer = 'https://youtu.be/' + trailer_id
+            description = json.get('description', 'N/A').replace('<i>', '').replace('</i>', '').replace('<br>', '')
+            msg += shorten(description, info) 
+            image = json.get('bannerImage', None)
+            if trailer:
+                buttons = [
+                    [InlineKeyboardButton("More Info", url=info),
+                    InlineKeyboardButton("Trailer 🎬", url=trailer)]
+                    ]
+            else:
+                buttons = [
+                    [InlineKeyboardButton("More Info", url=info)]
+                    ]
+            if image:
+                msg += f" [‎]({image})"
+                answers.append(InlineQueryResultArticle(
+                    id=uuid4(),
+                    title=f"{json['title']['romaji']}",
+                    description=f"{json['averageScore']}",
+                    input_message_content=InputTextMessageContent(msg, parse_mode="markdown", disable_web_page_preview=False),
+                    reply_markup=InlineKeyboardMarkup(buttons)))
+                await client.answer_inline_query(query.id,
+                                                results=answers,
+                                                cache_time=0
+                                                )
+            else:
+                answers.append(InlineQueryResultArticle(
+                    id=uuid4(),
+                    title=f"{json['title']['romaji']}",
+                    description=f"{json['averageScore']}",
+                    input_message_content=InputTextMessageContent(msg, parse_mode="markdown", disable_web_page_preview=True),
+                    reply_markup=InlineKeyboardMarkup(buttons)))
+                await client.answer_inline_query(query.id,
+                                                results=answers,
+                                                cache_time=0
+                                                )
         return

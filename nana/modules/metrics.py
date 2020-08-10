@@ -33,11 +33,7 @@ class Custom(dict):
 async def get_inactive(client, message):
     cmd = message.command
     start = time.time()
-    if len(cmd) > 1:
-        limit = int(" ".join(cmd[1:]))
-    else:
-        limit = 0
-
+    limit = int(" ".join(cmd[1:])) if len(cmd) > 1 else 0
     messages = [
         m
         async for member in client.iter_chat_members(
@@ -72,12 +68,12 @@ async def word_count(client, message):
     await message.delete()
     words = Custom()
     progress = await client.send_message(message.chat.id, "`Processing 1000 messages...`")
-    async for msg in client.iter_history(message.chat.id, 1000):
-        if msg.text:
-            for word in msg.text.split():
+    async for ms_g in client.iter_history(message.chat.id, 1000):
+        if ms_g.text:
+            for word in ms_g.text.split():
                 words[word.lower()] += 1
-        if msg.caption:
-            for word in msg.caption.split():
+        if ms_g.caption:
+            for word in ms_g.caption.split():
                 words[word.lower()] += 1
     freq = sorted(words, key=words.get, reverse=True)
     out = "Word Counter\n"

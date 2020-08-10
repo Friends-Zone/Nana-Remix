@@ -1,15 +1,11 @@
 import math
-import time
 import requests
-import json
 import asyncio
 
 from pyrogram import Filters
 
-
-from nana import app, Command, AdminSettings
-from nana.helpers.string import replace_text
-from nana.helpers.PyroHelpers import msg
+from nana import app, Command, AdminSettings, BotUsername
+from nana.helpers.PyroHelpers import msg, ReplyCheck
 
 
 __MODULE__ = "Anilist"
@@ -39,14 +35,14 @@ To get airing time of the anime.
 
 
 def shorten(description, info='anilist.co'):
-    msg = ""
+    ms_g = ""
     if len(description) > 700:
         description = description[0:500] + '....'
-        msg += f"\n**Description**: __{description}__[Read More]({info})"
+        ms_g += f"\n**Description**: __{description}__[Read More]({info})"
     else:
-        msg += f"\n**Description**: __{description}__"
+        ms_g += f"\n**Description**: __{description}__"
     return (
-        msg.replace("<br>", "")
+        ms_g.replace("<br>", "")
         .replace("</br>", "")
         .replace("<i>", "")
         .replace("</i>", "")
@@ -194,9 +190,9 @@ async def anime_airing(_client, message):
         url, json={'query': airing_query, 'variables': variables}).json()['data']['Media']
     ms_g = f"**Name**: **{response['title']['romaji']}**(`{response['title']['native']}`)\n**ID**: `{response['id']}`"
     if response['nextAiringEpisode']:
-        time = response['nextAiringEpisode']['timeUntilAiring'] * 1000
-        time = t(time)
-        ms_g += f"\n**Episode**: `{response['nextAiringEpisode']['episode']}`\n**Airing In**: `{time}`"
+        airing_time = response['nextAiringEpisode']['timeUntilAiring'] * 1000
+        airing_time_final = t(airing_time)
+        ms_g += f"\n**Episode**: `{response['nextAiringEpisode']['episode']}`\n**Airing In**: `{airing_time_final}`"
     else:
         ms_g += f"\n**Episode**:{response['episodes']}\n**Status**: `N/A`"
     await msg(message, text=ms_g)
@@ -204,46 +200,22 @@ async def anime_airing(_client, message):
 
 @app.on_message(Filters.user(AdminSettings) & Filters.command("anime", Command))
 async def anime_search(client, message):
-    search = message.text.split(' ', 1)
-    if len(search) == 1:
+    cmd = message.command
+    mock = ""
+    if len(cmd) > 1:
+        mock = " ".join(cmd[1:])
+    elif len(cmd) == 1:
+        await msg(message, text="`Format: anime <anime name>`")
+        await asyncio.sleep(2)
         await message.delete()
         return
-    else:
-        search = search[1]
-    variables = {'search': search}
-    json = requests.post(url, json={'query': anime_query, 'variables': variables}).json()[
-        'data'].get('Media', None)
-    if json:
-        ms_g = f"**{json['title']['romaji']}**(`{json['title']['native']}`)\n**Type**: {json['format']}\n**Status**: {json['status']}\n**Episodes**: {json.get('episodes', 'N/A')}\n**Duration**: {json.get('duration', 'N/A')} Per Ep.\n**Score**: {json['averageScore']}\n**Genres**: `"
-        for x in json['genres']:
-            ms_g += f"{x}, "
-        ms_g = ms_g[:-2] + '`\n'
-        ms_g += "**Studios**: `"
-        for x in json['studios']['nodes']:
-            ms_g += f"{x['name']}, "
-        ms_g = ms_g[:-2] + '`\n'
-        info = json.get('siteUrl')
-        trailer = json.get('trailer', None)
-        if trailer:
-            trailer_id = trailer.get('id', None)
-            site = trailer.get('site', None)
-            if site == "youtube":
-                trailer = 'https://youtu.be/' + trailer_id
-        description = json.get(
-            'description', 'N/A').replace('<i>', '').replace('</i>', '').replace('<br>', '')
-        ms_g += shorten(description, info)
-        image = json.get('bannerImage', None)
-        if trailer:
-            ms_g += f"\nTrailer: {trailer}"
-        if image:
-            try:
-                await message.delete()
-                await client.send_photo(message.chat.id, photo=image, caption=ms_g)
-            except:
-                ms_g += f" [〽️]({image})"
-                await msg(message, text=ms_g)
-        else:
-            await msg(message, text=ms_g)
+    x = await client.get_inline_bot_results(f"{BotUsername}", f"anime {mock}")
+    await message.delete()
+    await client.send_inline_bot_result(chat_id=message.chat.id,
+                                        query_id=x.query_id,
+                                        result_id=x.results[0].id,
+                                        reply_to_message_id=ReplyCheck(message),
+                                        hide_via=True)
 
 
 @app.on_message(Filters.user(AdminSettings) & Filters.command("character", Command))
