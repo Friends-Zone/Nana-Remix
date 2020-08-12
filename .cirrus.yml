@@ -25,6 +25,9 @@ docker_builder:
 publish_task:
   name: Deploy code to Heroku
   timeout_in: 45m
+  trigger_type: manual
+  depends_on:
+    - docker_builder
   only_if: $CIRRUS_BRANCH == "master" && $CIRRUS_REPO_OWNER == "MadeByThePinsHub"
   skip: "!changesInclude('.cirrus.yml', '**.{py}', 'Dockerfile', '**/*nana*/**')"
   env:
@@ -33,6 +36,7 @@ publish_task:
     # replace the value below with yours.
     HEROKU_API_KEY: ENCRYPTED[2b680a6cd5ba5be5ec156f0159039d9a58afae2307ed325bab4e8edf13ced624224c505b59d4af1f38ef25b9d229078d]
     HEROKU_APP_NAME: ENCRYPTED[0914901577755ca103a67e8d615bc0e9707319347f8274f4425751b51452bda90930d33210970359ade8a74cff984cbe]
-  fetch_script: git remote add heroku https://api:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME && git fetch --all
-  git_status_script: git branch -u heroku/master
-  deploy_script: git push
+  script: |
+    git remote add heroku https://api:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME && git fetch --all
+    git branch -u heroku/master
+    git push
