@@ -22,7 +22,7 @@ docker_builder:
   build_script: docker build --tag thepinsteam/nana-remix:TEST-BUILDS .
 
 # Heroku deployment using the 'git push' way.
-deploy_to_heroku_task:
+deploy_task:
   name: Deploy code to heroku
   timeout_in: 45m
   only_if: $CIRRUS_BRANCH == "master" && $CIRRUS_REPO_OWNER == "MadeByThePinsHub"
