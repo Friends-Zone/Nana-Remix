@@ -23,7 +23,6 @@ docker_builder:
 
 # Heroku deployment using the 'git push' way.
 publish_task:
-  name: Deploy code to Heroku
   timeout_in: 45m
   trigger_type: manual
   depends_on:
