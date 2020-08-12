@@ -27,7 +27,7 @@ publish_task:
   timeout_in: 45m
   trigger_type: manual
   depends_on:
-    - docker_builder
+    - Build and push Docker image to Docker Hub
   only_if: $CIRRUS_BRANCH == "master" && $CIRRUS_REPO_OWNER == "MadeByThePinsHub"
   skip: "!changesInclude('.cirrus.yml', '**.{py}', 'Dockerfile', '**/*nana*/**')"
   env:
