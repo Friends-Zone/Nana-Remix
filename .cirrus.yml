@@ -24,7 +24,7 @@ docker_builder:
 # Heroku deployment using the 'git push' way.
 publish_task:
   only_if: $BRANCH == 'master'
-  trigger_type: manual
+  depends_on: Build and push Docker image to Docker Hub
   container:
     image: alpine/git:latest
   env:
