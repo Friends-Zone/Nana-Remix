@@ -25,7 +25,7 @@ docker_builder:
 publish_task:
   only_if: $BRANCH == 'master'
   trigger_type: manual
-  containner:
+  container:
     image: alpine/git:latest
   env:
     # Only people with write access to this repo can decrypt the values of these encrypted values.
