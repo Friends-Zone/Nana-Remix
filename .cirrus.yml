@@ -25,7 +25,7 @@ docker_builder:
 publish_task:
   only_if: $BRANCH == 'master'
   trigger_type: manual
-    env:
+  env:
     # Only people with write access to this repo can decrypt the values of these encrypted values.
     # Please generate a new encrypted var on your Cirrus CI settings for your repo and
     # replace the value below with yours.
