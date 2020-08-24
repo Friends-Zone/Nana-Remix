@@ -88,16 +88,16 @@ async def sd_reveal(client, message):
         return
     if tags:
         await message.delete()
-        a = 'nana/file.png'
-        await client.download_media(message.reply_to_message.photo, file_name=a)
-        await client.send_photo('me', a)
-        os.remove(a)
+        reveal_pic = 'nana/downloads/pic_reveal.png'
+        await client.download_media(message.reply_to_message.photo, file_name=reveal_pic)
+        await client.send_photo('me', reveal_pic)
+        os.remove(reveal_pic)
     else:
         await message.delete()
-        a = 'nana/file.png'
-        await client.download_media(message.reply_to_message.photo, file_name=a)
-        await client.send_photo(message.chat.id, a)
-        os.remove(a)
+        reveal_pic = 'nana/downloads/pic_reveal.png'
+        await client.download_media(message.reply_to_message.photo, file_name=reveal_pic)
+        await client.send_photo(message.chat.id, reveal_pic)
+        os.remove(reveal_pic)
 
 
 @app.on_message(Filters.me & Filters.command("eval", Command))
