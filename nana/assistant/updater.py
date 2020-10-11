@@ -1,8 +1,9 @@
 import random
-
+import os
 from git import Repo
 from git.exc import GitCommandError, NoSuchPathError, InvalidGitRepositoryError
-from pyrogram import Filters, InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from nana import (
     setbot,
     Owner,
@@ -17,6 +18,7 @@ from nana import (
     HEROKU_API,
 )
 from nana.__main__ import restart_all, loop
+from nana.assistant.__main__ import dynamic_data_filter
 
 
 async def gen_chlog(repo, diff):
@@ -83,14 +85,6 @@ async def update_checker():
     await setbot.send_message(Owner, text, reply_markup=button, parse_mode="markdown")
 
 
-# For callback query button
-def dynamic_data_filter(data):
-    return Filters.create(
-        lambda flt, query: flt.data == query.data,
-        data=data,  # "data" kwarg is accessed with "flt.data" above
-    )
-
-
 @setbot.on_callback_query(dynamic_data_filter("update_now"))
 async def update_button(client, query):
     await client.send_message(Owner, "Updating, please wait...")
@@ -140,6 +134,16 @@ async def update_button(client, query):
             await client.send_message(Owner, "Why the fuck you added your Heroku API key in an non-Heroku environment? 😕 ")
         await client.send_message(Owner, "Build failed, check your Heroku app logs and fix it. If symptoms presist, file a new issue.")
         return
+    else:
+        try:
+            os.system('git reset --hard')
+            os.system('git pull')
+            os.system('pip install -U -r requirements.txt')
+            await client.send_message(Owner, "Built Successfully, Please Restart Manually in /settings")
+            return
+        except Exception as e:
+            await client.send_message(Owner, f"Build Unsuccess,\nLog:{e}")
+            return
     try:
         upstream.pull(brname)
         await client.send_message(Owner, "Successfully updated!\nRestarting at will...")

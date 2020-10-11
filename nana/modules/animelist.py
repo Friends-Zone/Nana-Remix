@@ -1,11 +1,14 @@
 import math
 import requests
 import asyncio
+import re
 
-from pyrogram import Filters
+from pyrogram import filters
 
-from nana import app, Command, AdminSettings, BotUsername
-from nana.helpers.PyroHelpers import msg, ReplyCheck
+from nana import app, Command, AdminSettings, BotUsername, edrep, Owner, setbot
+from nana.helpers.PyroHelpers import ReplyCheck
+from nana.modules.database import anime_db as sql
+from nana.assistant.__main__ import dynamic_data_filter
 
 
 __MODULE__ = "Anilist"
@@ -30,6 +33,10 @@ returns information about the manga.
 ──「 **Airing** 」──
 -> `airing <anime>`
 To get airing time of the anime.
+
+──「 **Favourite List** 」──
+-> `favourite`
+Get your favourite Anime list.
 
 """
 
@@ -67,20 +74,20 @@ def t(milliseconds: int) -> str:
 
 airing_query = '''
     query ($id: Int,$search: String) { 
-      Media (id: $id, type: ANIME,search: $search) { 
-        id
-        episodes
-        title {
-          romaji
-          english
-          native
+        Media (id: $id, type: ANIME,search: $search) { 
+            id
+            episodes
+            title {
+                romaji
+                english
+                native
+            }
+            nextAiringEpisode {
+                airingAt
+                timeUntilAiring
+                episode
+            } 
         }
-        nextAiringEpisode {
-           airingAt
-           timeUntilAiring
-           episode
-        } 
-      }
     }
     '''
 
@@ -179,11 +186,11 @@ query ($id: Int,$search: String) {
 url = 'https://graphql.anilist.co'
 
 
-@app.on_message(Filters.user(AdminSettings) & Filters.command("airing", Command))
+@app.on_message(filters.user(AdminSettings) & filters.command("airing", Command))
 async def anime_airing(_client, message):
     search_str = message.text.split(' ', 1)
     if len(search_str) == 1:
-        await msg(message, text='Format: `airing <anime name>`')
+        await edrep(message, text='Format: `airing <anime name>`')
         return
     variables = {'search': search_str[1]}
     response = requests.post(
@@ -195,17 +202,17 @@ async def anime_airing(_client, message):
         ms_g += f"\n**Episode**: `{response['nextAiringEpisode']['episode']}`\n**Airing In**: `{airing_time_final}`"
     else:
         ms_g += f"\n**Episode**:{response['episodes']}\n**Status**: `N/A`"
-    await msg(message, text=ms_g)
+    await edrep(message, text=ms_g)
 
 
-@app.on_message(Filters.user(AdminSettings) & Filters.command("anime", Command))
+@app.on_message(filters.user(AdminSettings) & filters.command("anime", Command))
 async def anime_search(client, message):
     cmd = message.command
     mock = ""
     if len(cmd) > 1:
         mock = " ".join(cmd[1:])
     elif len(cmd) == 1:
-        await msg(message, text="`Format: anime <anime name>`")
+        await edrep(message, text="`Format: anime <anime name>`")
         await asyncio.sleep(2)
         await message.delete()
         return
@@ -218,7 +225,7 @@ async def anime_search(client, message):
                                         hide_via=True)
 
 
-@app.on_message(Filters.user(AdminSettings) & Filters.command("character", Command))
+@app.on_message(filters.user(AdminSettings) & filters.command("character", Command))
 async def character_search(client, message):
     search = message.text.split(' ', 1)
     if len(search) == 1:
@@ -226,8 +233,7 @@ async def character_search(client, message):
         return
     search = search[1]
     variables = {'query': search}
-    json = requests.post(url, json={'query': character_query, 'variables': variables}).json()[
-        'data'].get('Character', None)
+    json = requests.post(url, json={'query': character_query, 'variables': variables}).json()['data'].get('Character', None)
     if json:
         ms_g = f"**{json.get('name').get('full')}**(`{json.get('name').get('native')}`)\n"
         description = f"{json['description']}"
@@ -239,10 +245,10 @@ async def character_search(client, message):
             await message.delete()
             await client.send_photo(message.chat.id, photo=image, caption=ms_g)
         else:
-            await msg(message, text=ms_g)
+            await edrep(message, text=ms_g)
 
 
-@app.on_message(Filters.user(AdminSettings) & Filters.command("manga", Command))
+@app.on_message(filters.user(AdminSettings) & filters.command("manga", Command))
 async def manga_search(client, message):
     search = message.text.split(' ', 1)
     if len(search) == 1:
@@ -281,6 +287,49 @@ async def manga_search(client, message):
                 await client.send_photo(message.chat.id, photo=image, caption=ms_g)
             except:
                 ms_g += f" [〽️]({image})"
-                await msg(message, text=ms_g)
+                await edrep(message, text=ms_g)
         else:
-            await msg(message, text=ms_g)
+            await edrep(message, text=ms_g)
+
+
+@app.on_message(filters.user(AdminSettings) & filters.command("favourite", Command))
+async def favourite_animelist(client, message):
+    x = await client.get_inline_bot_results(f"{BotUsername}", f"favourite")
+    await message.delete()
+    await client.send_inline_bot_result(chat_id=message.chat.id,
+                                        query_id=x.query_id,
+                                        result_id=x.results[0].id,
+                                        reply_to_message_id=ReplyCheck(message),
+                                        hide_via=True)
+
+
+async def addfav_callback(_, __, query):
+    if re.match(r"addfav_", query.data):
+        return True
+
+
+async def remfav_callback(_, __, query):
+    if re.match(r"remfav_", query.data):
+        return True
+
+
+@setbot.on_callback_query(filters.create(addfav_callback))
+async def add_favorite(client, query):
+    if query.from_user.id in AdminSettings:
+        match = query.data.split("_")[1]
+        add = sql.add_fav(Owner, match)
+        if add:
+            await query.answer('Added to Favourites', show_alert=True)
+        else:
+            await query.answer('Anime already Exists in Favourites', show_alert=True)
+    else:
+        await query.answer('You are not Allowed to Press this', show_alert=True)
+
+
+@setbot.on_callback_query(filters.create(remfav_callback))
+async def rem_favorite(client, query):
+    if query.from_user.id in AdminSettings:
+        sql.remove_fav(Owner)
+        await setbot.edit_inline_text(query.inline_message_id,'Removed from Favourites')
+    else:
+        await query.answer('You are not Allowed to Press this', show_alert=True)

@@ -23,15 +23,15 @@
     },
     "api_id": {
       "description": "To use this userbot, get your development App ID from https://my.telegram.org/apps.",
-      "value": ""
+      "required": true
     },
     "api_hash": {
       "description": "To use this userbot, get your development API hash from https://my.telegram.org/apps.",
-      "value": ""
+      "required": true
     },
     "Owner": {
       "description": "Go to some bot such as Rose and check your id there.",
-      "value": ""
+      "required": true
     },
     "Command": {
       "description": "Prefix command, separate by space.",
@@ -43,7 +43,7 @@
     },
     "DB_URI": {
       "description": "Required to use an external db, try ElephantSQL: https://customer.elephantsql.com/login",
-      "value": ""
+      "required": true
     },
     "ASSISTANT_WORKER": {
       "description": "(optional) Worker for Assistant bot",
@@ -154,10 +154,5 @@
       "description": "Read SpamWatch Docs on How to obtain api, https://docs.spamwat.ch/",
       "required": false
     }
-  },
-  "buildpacks": [
-    {
-      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
-    }
-  ]
+  }
 }
