@@ -4,11 +4,11 @@
 
 ## Userbot + Assistant for Telegram
 
-Currently work fine perfectly, but some features may give you error. Please report a bug to me if you facing any issues.
+Currently work fine perfectly, but some features may give you error. Please report a bug to me (or to [pokurt](https://t.me/pokurt)) if you facing any issues.
 
-## Installation Guide
+## Documentation
 
-[Visit the official documentation](https://aman-a.gitbook.io/nana-remix) to learn more how to setup your own Nana userbot + assistant.
+Visit <https://ajhalili2006.gitbook.io/nana-remix> for the full guidance from setting up to troubleshooting.
 
 ## Commands List
 
