@@ -4,15 +4,11 @@
 
 ## Userbot + Assistant for Telegram
 
-Currently work fine perfectly, but some features may give you error. Please report a bug to me (or to [pokurt](https://t.me/pokurt)) if you facing any issues.
+A Modular Pyrogram Based Userbot with an Assitant
 
 ## Documentation
 
-Visit <https://ajhalili2006.gitbook.io/nana-remix> for the full guidance from setting up to troubleshooting.
-
-## Commands List
-
-TO get all the available commands for the userbot + assistant, send `/help` on your Assistant.
+Visit <https://ajhalili2006.gitbook.io/nana-remix> (or the official docs at <https://nana.pokurt.me>) for the full guidance from setting up to troubleshooting.
 
 ## Community
 
@@ -22,8 +18,17 @@ and he'll help you fix your problem.
 
 ## Credits
 
-- [Telegram Userbot](https://github.com/RaphielGang/Telegram-UserBot)
-- [Paperlane Extended](https://github.com/AvinashReddy3108/PaperplaneExtended)
-- [Ayra Hikari](https://github.com/AyraHikari)
-- [LegenHand](https://github.com/legenhand)
-- [RealAkito](https://github.com/RealAkito)
+- [Ayra Hikari](https://github.com/AyraHikari) - For the Base of this Awesome Userbot
+- [LegenHand](https://github.com/legenhand) - Keeping the project Alive
+- [RealAkito](https://github.com/RealAkito) - Translation Engine
+
+### Translators
+
+- [pokurt](https://github.com/pokurt) - English & Spanish & Japanese & German
+- [iMat1n](https://github.com/iMat1n) - Persian
+- [iiiiii1wepfj](https://github.com/iiiiii1wepfj) - Hebrew
+- [breakdowns](https://github.com/breakdowns) - Indonesian
+- [spkal01](https://github.com/spkal01) - Greek & English
+- [NachABR](https://github.com/NachABR) - Spanish
+- [rojserbest](https://github.com/rojserbest) - Kurdish
+- [SelaxG](https://github.com/SelaxG) - Turkish

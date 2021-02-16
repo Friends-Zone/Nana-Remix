@@ -1,15 +1,21 @@
 import asyncio
 import importlib
 import sys
-import time
 import traceback
 
 from pyrogram import idle
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+from pyrogram.types import InlineKeyboardButton
 
-from nana import app, Owner, log, setbot, get_self, get_bot
-from nana.assistant import ALL_SETTINGS
-from nana.modules import ALL_MODULES
+from pykeyboard import InlineKeyboard
+
+from nana import app
+from nana import Owner
+from nana import log
+from nana import setbot
+from nana import get_self
+from nana import get_bot
+from nana.plugins.assistant import ALL_SETTINGS
+from nana.plugins import ALL_MODULES
 
 try:
     from nana import TEST_DEVELOP
@@ -29,7 +35,7 @@ async def get_runtime():
 async def reload_userbot():
     await app.start()
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module("nana.modules." + modul)
+        imported_module = importlib.import_module('nana.plugins.' + modul)
         importlib.reload(imported_module)
 
 
@@ -40,53 +46,66 @@ async def reinitial_restart():
 
 async def reboot():
     global BOT_RUNTIME, HELP_COMMANDS
-    importlib.reload(importlib.import_module("nana.modules"))
-    importlib.reload(importlib.import_module("nana.assistant"))
-    # await setbot.send_message(Owner, "Bot is restarting...")
+    importlib.reload(importlib.import_module('nana.plugins'))
+    importlib.reload(importlib.import_module('nana.plugins.assistant'))
     await setbot.restart()
     await app.restart()
     await reinitial_restart()
-    # Reset global var
     BOT_RUNTIME = 0
     HELP_COMMANDS = {}
     # Assistant bot
     for setting in ALL_SETTINGS:
-        imported_module = importlib.import_module("nana.assistant." + setting)
+        imported_module = importlib.import_module(
+            'nana.plugins.assistant.' + setting,
+        )
         importlib.reload(imported_module)
     # Nana userbot
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module("nana.modules." + modul)
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
+        imported_module = importlib.import_module('nana.plugins.' + modul)
+        if hasattr(
+            imported_module,
+            '__MODULE__',
+        ) and imported_module.__MODULE__:
             imported_module.__MODULE__ = imported_module.__MODULE__
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
+        if hasattr(
+            imported_module,
+            '__MODULE__',
+        ) and imported_module.__MODULE__:
             if imported_module.__MODULE__.lower() not in HELP_COMMANDS:
-                HELP_COMMANDS[imported_module.__MODULE__.lower()] = imported_module
+                HELP_COMMANDS[
+                    imported_module.__MODULE__.lower()
+                ] = imported_module
             else:
-                raise Exception("Can't have two modules with the same name! Please change one")
-        if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
+                raise Exception(
+                    "Can't have two modules with the same name!",
+                )
+        if hasattr(imported_module, '__HELP__') and imported_module.__HELP__:
             HELP_COMMANDS[imported_module.__MODULE__.lower()] = imported_module
         importlib.reload(imported_module)
 
 
 # await setbot.send_message(Owner, "Restart successfully!")
 
+
 async def restart_all():
     # Restarting and load all plugins
     asyncio.get_event_loop().create_task(reboot())
 
 
-RANDOM_STICKERS = ["CAADAgAD6EoAAuCjggf4LTFlHEcvNAI", "CAADAgADf1AAAuCjggfqE-GQnopqyAI",
-                   "CAADAgADaV0AAuCjggfi51NV8GUiRwI"]
-
-
 async def except_hook(errtype, value, tback):
     sys.__excepthook__(errtype, value, tback)
     errors = traceback.format_exception(etype=errtype, value=value, tb=tback)
-    button = InlineKeyboardMarkup([[InlineKeyboardButton("🐞 Report bugs", callback_data="report_errors")]])
-    text = "An error has accured!\n\n```{}```\n".format("".join(errors))
+    keyboard = InlineKeyboard(row_width=1)
+    keyboard.add(
+        InlineKeyboardButton(
+            '🐞 Report bugs',
+            callback_data='report_errors',
+        ),
+    )
+    text = 'An error has accured!\n\n```{}```\n'.format(''.join(errors))
     if errtype == ModuleNotFoundError:
-        text += "\nHint: Try this in your terminal `pip install -r requirements.txt`"
-    await setbot.send_message(Owner, text, reply_markup=button)
+        text += '\nHint: `pip install -r requirements.txt`'
+    await setbot.send_message(Owner, text, reply_markup=keyboard)
 
 
 async def reinitial():
@@ -99,62 +118,74 @@ async def reinitial():
 
 
 async def start_bot():
-    # sys.excepthook = except_hook
-    print("----- Checking user and bot... -----")
+    # sys.excepthook = await except_hook
+    print('----- Checking user and bot... -----')
     await reinitial()
-    print("----------- Check done! ------------")
+    print('----------- Check done! ------------')
     # Assistant bot
     await setbot.start()
     for setting in ALL_SETTINGS:
-        imported_module = importlib.import_module("nana.assistant." + setting)
+        imported_module = importlib.import_module(
+            'nana.plugins.assistant.' + setting,
+        )
     # Nana userbot
     await app.start()
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module("nana.modules." + modul)
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
+        imported_module = importlib.import_module('nana.plugins.' + modul)
+        if hasattr(
+            imported_module,
+            '__MODULE__',
+        ) and imported_module.__MODULE__:
             imported_module.__MODULE__ = imported_module.__MODULE__
-        if hasattr(imported_module, "__MODULE__") and imported_module.__MODULE__:
+        if hasattr(
+            imported_module,
+            '__MODULE__',
+        ) and imported_module.__MODULE__:
             if imported_module.__MODULE__.lower() not in HELP_COMMANDS:
-                HELP_COMMANDS[imported_module.__MODULE__.lower()] = imported_module
+                HELP_COMMANDS[
+                    imported_module.__MODULE__.lower()
+                ] = imported_module
             else:
-                raise Exception("Can't have two modules with the same name! Please change one")
-        if hasattr(imported_module, "__HELP__") and imported_module.__HELP__:
+                raise Exception(
+                    "Can't have two modules with the same name!",
+                )
+        if hasattr(imported_module, '__HELP__') and imported_module.__HELP__:
             HELP_COMMANDS[imported_module.__MODULE__.lower()] = imported_module
-    userbot_modules = ""
-    assistant_modules = ""
+    userbot_modules = ''
+    assistant_modules = ''
     j = 1
     for i in ALL_MODULES:
         if j == 4:
-            userbot_modules += "|{:<15}|\n".format(i)
+            userbot_modules += f'|{i:<15}|\n'
             j = 0
         else:
-            userbot_modules += "|{:<15}".format(i)
+            userbot_modules += f'|{i:<15}'
         j += 1
     j = 1
     for i in ALL_SETTINGS:
         if j == 4:
-            assistant_modules += "|{:<15}|\n".format(i)
+            assistant_modules += f'|{i:<15}|\n'
             j = 0
         else:
-            assistant_modules += "|{:<15}".format(i)
+            assistant_modules += f'|{i:<15}'
         j += 1
-    print("+===============================================================+")
-    print("|                      Userbot Modules                          |")
-    print("+===============+===============+===============+===============+")
+    print('+===============================================================+')
+    print('|                     Userbot Modules                           |')
+    print('+=============+===============+================+===============+')
     print(userbot_modules)
-    print("+===============+===============+===============+===============+\n")
-    print("+===============================================================+")
-    print("|                    Assistant Modules                          |")
-    print("+===============+===============+===============+===============+")
+    print('+=============+===================+=============+===============+')
+    print('+===============================================================+')
+    print('|                     Assistant Modules                         |')
+    print('+=============+=================+===============+===============+')
     print(assistant_modules)
-    print("+===============+===============+===============+===============+")
-    print("Bot run successfully!")
+    print('+===============+=============+===============+=================+')
+    print('Logged in User: {}'.format((await app.get_me()).first_name))
+    print('Logged in Bot: {}'.format((await setbot.get_me()).first_name))
     if TEST_DEVELOP:
-        log.warning("Test is passed!")
+        log.warning('Test is passed!')
     else:
         await idle()
 
 
 if __name__ == '__main__':
-    BOT_RUNTIME = int(time.time())
     loop.run_until_complete(start_bot())
