@@ -82,20 +82,12 @@ async def ocr(client, message):
     try:
         ParsedText = test_file['ParsedResults'][0]['ParsedText']
     except BaseException as e:
-<<<<<<< HEAD:nana/modules/ocr.py
         await edrep(message, text=e)
-=======
         await edit_or_reply(message, text=e)
->>>>>>> 4e6873745723dc3055cc2cff0052500c8d4df559:nana/plugins/ocr.py
     else:
         if ParsedText == 'ParsedResults':
             await message.delete()
             return
         else:
-<<<<<<< HEAD:nana/modules/ocr.py
-            await edrep(message, text=f"`{ParsedText}`")
-    os.remove(downloaded_file_name)
-=======
             await edit_or_reply(message, text=f'`{ParsedText}`')
     os.remove(downloaded_file_name)
->>>>>>> 4e6873745723dc3055cc2cff0052500c8d4df559:nana/plugins/ocr.py
