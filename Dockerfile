@@ -62,9 +62,6 @@ WORKDIR /app
 # containners after all.
 ENV ENV True
 
-# copy the content of the local src directory to the working directory
-COPY . .
-
 # Install deps using our Makefile
 RUN make install
 
