@@ -35,7 +35,7 @@ async def get_runtime():
 async def reload_userbot():
     await app.start()
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module('nana.plugins.' + modul)
+        imported_module = importlib.import_module(f'nana.plugins.{modul}')
         importlib.reload(imported_module)
 
 
@@ -55,13 +55,11 @@ async def reboot():
     HELP_COMMANDS = {}
     # Assistant bot
     for setting in ALL_SETTINGS:
-        imported_module = importlib.import_module(
-            'nana.plugins.assistant.' + setting,
-        )
+        imported_module = importlib.import_module(f'nana.plugins.assistant.{setting}')
         importlib.reload(imported_module)
     # Nana userbot
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module('nana.plugins.' + modul)
+        imported_module = importlib.import_module(f'nana.plugins.{modul}')
         if hasattr(
             imported_module,
             '__MODULE__',
@@ -125,13 +123,11 @@ async def start_bot():
     # Assistant bot
     await setbot.start()
     for setting in ALL_SETTINGS:
-        imported_module = importlib.import_module(
-            'nana.plugins.assistant.' + setting,
-        )
+        imported_module = importlib.import_module(f'nana.plugins.assistant.{setting}')
     # Nana userbot
     await app.start()
     for modul in ALL_MODULES:
-        imported_module = importlib.import_module('nana.plugins.' + modul)
+        imported_module = importlib.import_module(f'nana.plugins.{modul}')
         if hasattr(
             imported_module,
             '__MODULE__',
@@ -179,8 +175,8 @@ async def start_bot():
     print('+=============+=================+===============+===============+')
     print(assistant_modules)
     print('+===============+=============+===============+=================+')
-    print('Logged in User: {}'.format((await app.get_me()).first_name))
-    print('Logged in Bot: {}'.format((await setbot.get_me()).first_name))
+    print(f'Logged in User: {(await app.get_me()).first_name}')
+    print(f'Logged in Bot: {(await setbot.get_me()).first_name}')
     if TEST_DEVELOP:
         log.warning('Test is passed!')
     else:

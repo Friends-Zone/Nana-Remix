@@ -34,9 +34,9 @@ async def change_repo(url):
         if len(heroku_applications) >= 1:
             heroku_app = heroku_applications[0]
             heroku_git_url = heroku_app.git_url.replace(
-                "https://",
-                "https://api:" + HEROKU_API + "@"
+                "https://", f"https://api:{HEROKU_API}@"
             )
+
             if "heroku" in repo.remotes:
                 remote = repo.remote("heroku")
                 remote.set_url(heroku_git_url)
@@ -53,9 +53,8 @@ async def configrepo():
         # So I place it in an GitHub Gist instead. Please comment there if any changes happens.
         config_url = "https://gist.githubusercontent.com/AndreiJirohHaliliDev2006/b2e7f3c93aa44bf4810cfd6dba7d8541/raw/d985279c9416b4d3ec02bef663d4a91b2b25cbdb/repo.json"
         urllib.request.urlretrieve(config_url, cache_path)
-    f = open("nana/cache/repo.json")
-    data_repo = json.load(f)
-    f.close()
+    with open("nana/cache/repo.json") as f:
+        data_repo = json.load(f)
     return data_repo
 
 
@@ -66,10 +65,11 @@ async def chgrepo(_client, query):
 
     data_repo = await configrepo()
 
-    list_button = []
-    for r in data_repo.items():
-        list_button.append([InlineKeyboardButton(r[0],
-                            callback_data=r[0])])
+    list_button = [
+        [InlineKeyboardButton(r[0], callback_data=r[0])]
+        for r in data_repo.items()
+    ]
+
     list_button.append([InlineKeyboardButton("⬅ back️", callback_data="back")])
     button = InlineKeyboardMarkup(list_button)
     await query.message.edit_text(text, reply_markup=button)
@@ -80,9 +80,11 @@ async def chgrepoo(_client, query):
     rp = await configrepo()
     global repo_name
     repo_name = query.data
-    list_button = []
-    for version in rp[query.data]["version"]:
-        list_button.append([InlineKeyboardButton(version, callback_data=f"vs{version}")])
+    list_button = [
+        [InlineKeyboardButton(version, callback_data=f"vs{version}")]
+        for version in rp[query.data]["version"]
+    ]
+
     list_button.append([InlineKeyboardButton("⬅ back️", callback_data="change_repo")])
     text = "**⚙️ Repository Configuration **\n" \
            "`Change Your Repo Source Here! `\n"
@@ -97,7 +99,6 @@ async def chgrepoo(_client, query):
 async def selectversion(_client, query):
     ver = query.data[2:]
     rp = await configrepo()
-    list_button = []
     global repo_name, repo_docker
     desc = rp[repo_name]["version"][ver]["description"]
     print(rp[repo_name]["version"][ver])
@@ -108,8 +109,15 @@ async def selectversion(_client, query):
             "This feature is still experimental! \n " \
             "Your bot might broken after change repo \n" \
             "Use at your own risk! "
-    list_button.append([InlineKeyboardButton("Agree and Continue", callback_data="chg_repo")])
-    list_button.append([InlineKeyboardButton("⬅ Return to the list", callback_data="change_repo")])
+    list_button = [
+        [InlineKeyboardButton("Agree and Continue", callback_data="chg_repo")],
+        [
+            InlineKeyboardButton(
+                "⬅ Return to the list", callback_data="change_repo"
+            )
+        ],
+    ]
+
     button = InlineKeyboardMarkup(list_button)
     await query.message.edit_text(text, reply_markup=button)
 

@@ -122,8 +122,9 @@ async def update_button(client, query):
         if len(heroku_applications) >= 1:
             heroku_app = heroku_applications[0]
             heroku_git_url = heroku_app.git_url.replace(
-                "https://", "https://api:" + HEROKU_API + "@"
+                "https://", f"https://api:{HEROKU_API}@"
             )
+
             if "heroku" in repo.remotes:
                 remote = repo.remote("heroku")
                 remote.set_url(heroku_git_url)

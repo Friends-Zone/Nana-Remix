@@ -46,8 +46,7 @@ async def dictionary(_, message):
         if isinstance(r_dec, list):
             r_dec = r_dec[0]
             v_word = r_dec['word']
-        last_output = out_print(r_dec)
-        if last_output:
+        if last_output := out_print(r_dec):
             await edit_or_reply(
                 message,
                 text='`Search reasult for   `'

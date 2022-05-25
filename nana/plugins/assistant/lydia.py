@@ -25,26 +25,24 @@ api_ = LydiaAI(CoffeeHouseAPI)
 async def add_chat(_, message):
     global api_
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
+    if is_chat := sql.is_chat(chat_id):
+        await message.reply('AI is already enabled for this chat!')
+    else:
         ses = api_.create_session()
         ses_id = str(ses.id)
         expires = str(ses.expires)
         sql.set_ses(chat_id, ses_id, expires)
         await message.reply('AI successfully enabled for this chat!')
-    else:
-        await message.reply('AI is already enabled for this chat!')
 
 
 @setbot.on_message(filters.user(AdminSettings) & filters.command(['rmchat']))
 async def remove_chat(_, message):
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
-        await message.reply("AI isn't enabled here in the first place!")
-    else:
+    if is_chat := sql.is_chat(chat_id):
         sql.rem_chat(chat_id)
         await message.reply('AI disabled successfully!')
+    else:
+        await message.reply("AI isn't enabled here in the first place!")
 
 
 @setbot.on_message(
@@ -83,15 +81,14 @@ async def chat_bot(client, message):
             reply_text = re.sub(r'N([aeiouAEIOU])', r'Ny\1', reply_text)
             reply_text = re.sub(r'Ｎ([ａｅｉｏｕＡＥＩＯＵ])', r'Ｎｙ\1', reply_text)
             reply_text = re.sub(
-                r'\!+', ' ' + random.choice(meme_strings.faces), reply_text,
+                r'\!+', f' {random.choice(meme_strings.faces)}', reply_text
             )
-            reply_text = re.sub(
-                r'！+', ' ' + random.choice(meme_strings.faces), reply_text,
-            )
+
+            reply_text = re.sub(r'！+', f' {random.choice(meme_strings.faces)}', reply_text)
             reply_text = reply_text.replace('ove', 'uv')
             reply_text = reply_text.replace('ｏｖｅ', 'ｕｖ')
             reply_text = reply_text.replace('.', ',,.')
-            reply_text += ' ' + random.choice(meme_strings.faces)
+            reply_text += f' {random.choice(meme_strings.faces)}'
             await asyncio.sleep(0.3)
             await message.reply_text(reply_text.lower(), quote=True)
         except CFError as e:
@@ -104,8 +101,7 @@ async def check_message(_, message):
     reply_msg = message.reply_to_message
     if message.text.lower() == f'{BotUsername}':
         return True
-    if reply_msg:
-        if reply_msg.from_user.id == BotID:
-            return True
-    else:
+    if not reply_msg:
         return False
+    if reply_msg.from_user.id == BotID:
+        return True

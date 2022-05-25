@@ -46,8 +46,7 @@ branch_button_create = filters.create(branch_button_callback)
 
 @setbot.on_callback_query(branch_button_create)
 async def change_to_branch(client, query):
-    branch_match = re.findall(r'master|dev|translations', query.data)
-    if branch_match:
+    if branch_match := re.findall(r'master|dev|translations', query.data):
         try:
             repo.git.checkout(branch_match[0])
         except GitCommandError as exc:

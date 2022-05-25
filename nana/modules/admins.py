@@ -124,13 +124,14 @@ async def pin_message(client, message):
         if can_pin:
             try:
                 if message.reply_to_message:
-                    disable_notification = True
-                    if len(message.command) >= 2 and message.command[1] in [
+                    disable_notification = len(
+                        message.command
+                    ) < 2 or message.command[1] not in [
                         "alert",
                         "notify",
                         "loud",
-                    ]:
-                        disable_notification = False
+                    ]
+
                     await client.pin_chat_message(
                         message.chat.id,
                         message.reply_to_message.message_id,
@@ -750,9 +751,7 @@ async def view_perm(client, message):
         v_perm = await client.get_chat(message.chat.id)
 
         def convert_to_emoji(val: bool):
-            if val:
-                return "<code>True</code>"
-            return "<code>False</code>"
+            return "<code>True</code>" if val else "<code>False</code>"
 
         vmsg = convert_to_emoji(v_perm.permissions.can_send_messages)
         vmedia = convert_to_emoji(v_perm.permissions.can_send_media_messages)

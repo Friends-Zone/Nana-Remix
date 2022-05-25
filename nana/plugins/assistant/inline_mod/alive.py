@@ -17,7 +17,7 @@ async def alive_func(answers):
         me = await app.get_me()
     except ConnectionError:
         me = None
-    nana_stats = 'stopped' if not me else 'alive'
+    nana_stats = 'alive' if me else 'stopped'
     buttons.add(
         InlineKeyboardButton(
             '🏓',

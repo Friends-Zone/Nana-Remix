@@ -25,11 +25,12 @@ async def is_userbot_run():
 
 async def get_text_settings():
     me = await is_userbot_run()
-    if not me:
-        text = "-> Userbot: `Stopped (v{})`\n".format(USERBOT_VERSION)
-    else:
-        text = "-> Userbot: `Running (v{})`\n".format(USERBOT_VERSION)
-    text += "-> Assistant: `Running (v{})`\n".format(ASSISTANT_VERSION)
+    text = (
+        "-> Userbot: `Running (v{})`\n".format(USERBOT_VERSION)
+        if me
+        else "-> Userbot: `Stopped (v{})`\n".format(USERBOT_VERSION)
+    ) + "-> Assistant: `Running (v{})`\n".format(ASSISTANT_VERSION)
+
     text += "-> Database: `{}`\n".format(DB_AVAILABLE)
     text += "-> Python: `{}`\n".format(python_version())
     return text
@@ -140,7 +141,7 @@ async def vars_heroku(_client, query):
             #     list_button.insert(0, [InlineKeyboardButton("api_id🚫", callback_data="api_id")])
             configdict = config.to_dict()
             for x, _ in configdict.items():
-                list_button.insert(0, [InlineKeyboardButton("{}✅".format(x), callback_data="tes")])
+                list_button.insert(0, [InlineKeyboardButton(f"{x}✅", callback_data="tes")])
     button = InlineKeyboardMarkup(list_button)
     await query.message.edit_text(text, reply_markup=button)
 

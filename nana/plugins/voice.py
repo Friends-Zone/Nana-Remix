@@ -108,8 +108,7 @@ async def voicelang(_, message):
 )
 async def speach_to_text(client, message):
     start = datetime.now()
-    input_str = message.reply_to_message.voice
-    if input_str:
+    if input_str := message.reply_to_message.voice:
         required_file_name = await download_reply_nocall(client, message)
         if IBM_WATSON_CRED_URL is None or IBM_WATSON_CRED_PASSWORD is None:
             await edit_or_reply(
@@ -173,12 +172,8 @@ async def parse_response(headers, data):
         [text]: [the speach to text response]
     """
     async with ClientSession(headers=headers) as ses:
-        async with ses.post(
-            IBM_WATSON_CRED_URL + '/v1/recognize',
-            data=data,
-            auth=BasicAuth(
-                'apikey',
-                IBM_WATSON_CRED_PASSWORD,
-            ),
-        ) as resp:
+        async with ses.post(f'{IBM_WATSON_CRED_URL}/v1/recognize', data=data, auth=BasicAuth(
+                        'apikey',
+                        IBM_WATSON_CRED_PASSWORD,
+                    )) as resp:
             return await resp.json()

@@ -66,11 +66,7 @@ async def take_screen_shot(
         screen_shot,
         f'{basename(video_file)}.jpg',
     )
-    command = "ffmpeg -ss {} -i '{}' -vframes 1 '{}'".format(
-        ttl,
-        video_file,
-        thumb_image_path,
-    )
+    command = f"ffmpeg -ss {ttl} -i '{video_file}' -vframes 1 '{thumb_image_path}'"
     err = (await run_cmd(command))[1]
     if err:
         _LOG.error(err)
@@ -176,15 +172,14 @@ async def tracemoe_rs(client, message):
                 return
             dis_loc = img_file
         if message_.video:
-            nama = 'video_{}-{}.mp4'.format(
-                message.reply_to_message.video.date,
-                message.reply_to_message.video.file_size,
-            )
+            nama = f'video_{message.reply_to_message.video.date}-{message.reply_to_message.video.file_size}.mp4'
+
             await client.download_media(
                 message.reply_to_message.video,
-                file_name='nana/downloads/' + nama,
+                file_name=f'nana/downloads/{nama}',
             )
-            dis_loc = 'nana/downloads/' + nama
+
+            dis_loc = f'nana/downloads/{nama}'
             img_file = os.path.join(screen_shot, 'grs.jpg')
             await take_screen_shot(dis_loc, 0, img_file)
             if not os.path.lexists(img_file):

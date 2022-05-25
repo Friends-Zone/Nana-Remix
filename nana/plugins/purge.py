@@ -99,7 +99,7 @@ async def purge_myself(client, message):
         semua = listall
         jarak = 0
         jarak2 = 0
-        for x in range(math.ceil(len(semua) / 100)):
+        for _ in range(math.ceil(len(semua) / 100)):
             if total >= 101:
                 jarak2 += 100
                 await client.delete_messages(

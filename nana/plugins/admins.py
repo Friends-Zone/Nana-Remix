@@ -195,13 +195,14 @@ async def pin_message(client, message):
         if can_pin:
             try:
                 if message.reply_to_message:
-                    disable_notification = True
-                    if len(message.command) >= 2 and message.command[1] in [
+                    disable_notification = len(
+                        message.command
+                    ) < 2 or message.command[1] not in [
                         'alert',
                         'notify',
                         'loud',
-                    ]:
-                        disable_notification = False
+                    ]
+
                     await client.pin_chat_message(
                         message.chat.id,
                         message.reply_to_message.message_id,
@@ -589,19 +590,8 @@ async def lock_permission(client, message):
                 message.delete(),
             )
 
-        if lock_type == 'messages':
-            messages = False
-            perm = 'messages'
-
-        elif lock_type == 'media':
-            media = False
-            perm = (
-                'audios, documents, photos, videos, video notes, voice notes'
-            )
-
-        elif lock_type == 'stickers':
-            stickers = False
-            perm = 'stickers'
+            await message.delete()
+            return
 
         elif lock_type == 'animations':
             animations = False
@@ -611,29 +601,43 @@ async def lock_permission(client, message):
             games = False
             perm = 'games'
 
-        elif lock_type == 'inlinebots':
-            inlinebots = False
-            perm = 'inline bots'
-
-        elif lock_type == 'webprev':
-            webprev = False
-            perm = 'web page previews'
-
-        elif lock_type == 'polls':
-            polls = False
-            perm = 'polls'
-
         elif lock_type == 'info':
             info = False
             perm = 'info'
+
+        elif lock_type == 'inlinebots':
+            inlinebots = False
+            perm = 'inline bots'
 
         elif lock_type == 'invite':
             invite = False
             perm = 'invite'
 
+        elif lock_type == 'media':
+            media = False
+            perm = (
+                'audios, documents, photos, videos, video notes, voice notes'
+            )
+
+        elif lock_type == 'messages':
+            messages = False
+            perm = 'messages'
+
         elif lock_type == 'pin':
             pin = False
             perm = 'pin'
+
+        elif lock_type == 'polls':
+            polls = False
+            perm = 'polls'
+
+        elif lock_type == 'stickers':
+            stickers = False
+            perm = 'stickers'
+
+        elif lock_type == 'webprev':
+            webprev = False
+            perm = 'web page previews'
 
         else:
             await message.delete()
@@ -847,9 +851,7 @@ async def view_perm(client, message):
         v_perm = await client.get_chat(message.chat.id)
 
         def convert_to_emoji(val: bool):
-            if val:
-                return '<code>True</code>'
-            return '<code>False</code>'
+            return '<code>True</code>' if val else '<code>False</code>'
 
         vmsg = convert_to_emoji(v_perm.permissions.can_send_messages)
         vmedia = convert_to_emoji(v_perm.permissions.can_send_media_messages)
@@ -948,9 +950,7 @@ async def deleted_clean(client, message):
             if member.user.is_deleted:
                 del_users += 1
         if del_users > 0:
-            del_stats = '`Found` **{}** `in this chat.`'.format(
-                del_users,
-            )
+            del_stats = f'`Found` **{del_users}** `in this chat.`'
         await edit_or_reply(message, text=del_stats)
 
 

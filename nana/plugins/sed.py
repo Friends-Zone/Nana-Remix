@@ -75,15 +75,13 @@ async def separate_sed(sed_string):
     else:
         return replace, sed_string[start:], ''
 
-    flags = ''
-    if counter < len(sed_string):
-        flags = sed_string[counter:]
+    flags = sed_string[counter:] if counter < len(sed_string) else ''
     return replace, replace_with, flags.lower()
 
 
 @app.on_message(filters.user(AdminSettings) & filters.regex('^s/(.*?)'))
 async def sed_msg(_, message):
-    sed_result = await separate_sed('s/' + message.text)
+    sed_result = await separate_sed(f's/{message.text}')
     if sed_result:
         if not message.reply_to_message:
             return
@@ -98,7 +96,7 @@ async def sed_msg(_, message):
 
         try:
             check = re.match(repl, to_fix, flags=re.IGNORECASE)
-            if check and check.group(0).lower() == to_fix.lower():
+            if check and check[0].lower() == to_fix.lower():
                 return
 
             if 'i' in flags and 'g' in flags:

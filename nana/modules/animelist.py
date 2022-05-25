@@ -44,7 +44,7 @@ Get your favourite Anime list.
 def shorten(description, info='anilist.co'):
     ms_g = ""
     if len(description) > 700:
-        description = description[0:500] + '....'
+        description = description[:500] + '....'
         ms_g += f"\n**Description**: __{description}__[Read More]({info})"
     else:
         ms_g += f"\n**Description**: __{description}__"
@@ -60,15 +60,18 @@ def shorten(description, info='anilist.co'):
 def t(milliseconds: int) -> str:
     """Inputs time in milliseconds, to get beautified time,
     as string"""
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + " Days, ") if days else "") + \
-        ((str(hours) + " Hours, ") if hours else "") + \
-        ((str(minutes) + " Minutes, ") if minutes else "") + \
-        ((str(seconds) + " Seconds, ") if seconds else "") + \
-        ((str(milliseconds) + " ms, ") if milliseconds else "")
+    tmp = (
+        (f"{str(days)} Days, " if days else "")
+        + (f"{str(hours)} Hours, " if hours else "")
+        + (f"{str(minutes)} Minutes, " if minutes else "")
+        + (f"{str(seconds)} Seconds, " if seconds else "")
+        + (f"{str(milliseconds)} ms, " if milliseconds else "")
+    )
+
     return tmp[:-2]
 
 
@@ -233,14 +236,18 @@ async def character_search(client, message):
         return
     search = search[1]
     variables = {'query': search}
-    json = requests.post(url, json={'query': character_query, 'variables': variables}).json()['data'].get('Character', None)
-    if json:
+    if (
+        json := requests.post(
+            url, json={'query': character_query, 'variables': variables}
+        )
+        .json()['data']
+        .get('Character', None)
+    ):
         ms_g = f"**{json.get('name').get('full')}**(`{json.get('name').get('native')}`)\n"
         description = f"{json['description']}"
         site_url = json.get('siteUrl')
         ms_g += shorten(description, site_url)
-        image = json.get('image', None)
-        if image:
+        if image := json.get('image', None):
             image = image.get('large')
             await message.delete()
             await client.send_photo(message.chat.id, photo=image, caption=ms_g)
@@ -294,7 +301,7 @@ async def manga_search(client, message):
 
 @app.on_message(filters.user(AdminSettings) & filters.command("favourite", Command))
 async def favourite_animelist(client, message):
-    x = await client.get_inline_bot_results(f"{BotUsername}", f"favourite")
+    x = await client.get_inline_bot_results(f"{BotUsername}", "favourite")
     await message.delete()
     await client.send_inline_bot_result(chat_id=message.chat.id,
                                         query_id=x.query_id,
@@ -317,8 +324,7 @@ async def remfav_callback(_, __, query):
 async def add_favorite(client, query):
     if query.from_user.id in AdminSettings:
         match = query.data.split("_")[1]
-        add = sql.add_fav(Owner, match)
-        if add:
+        if add := sql.add_fav(Owner, match):
             await query.answer('Added to Favourites', show_alert=True)
         else:
             await query.answer('Anime already Exists in Favourites', show_alert=True)

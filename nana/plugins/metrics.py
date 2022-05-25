@@ -50,15 +50,13 @@ async def get_inactive(client, message):
     messages.sort(key=lambda k: k['date'])
 
     return '\n'.join(
-        [
-            '{} last [message]({}) was {}'.format(
-                m.from_user.mention,
-                m.link,
-                timeago.format(m.date),
-            )
-            for m in messages
-        ]
-        + [f'`{int(delta * 1000)}ms`'],
+        (
+            [
+                f'{m.from_user.mention} last [message]({m.link}) was {timeago.format(m.date)}'
+                for m in messages
+            ]
+            + [f'`{int(delta * 1000)}ms`']
+        )
     )
 
 

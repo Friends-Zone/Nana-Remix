@@ -44,7 +44,7 @@ async def anime_func(string, answers):
             trailer_id = trailer.get('id', None)
             site = trailer.get('site', None)
             if site == 'youtube':
-                trailer = 'https://youtu.be/' + trailer_id
+                trailer = f'https://youtu.be/{trailer_id}'
         description = (
             json.get('description', 'N/A')
             .replace('<i>', '')

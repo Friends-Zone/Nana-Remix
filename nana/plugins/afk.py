@@ -109,10 +109,10 @@ async def afk_mentioned(_, message):
             )
         else:
             await edit_or_reply(
-                message, text='Sorry, {} is AFK!'.format(
-                    mention_markdown(Owner, OwnerName),
-                ),
+                message,
+                text=f'Sorry, {mention_markdown(Owner, OwnerName)} is AFK!',
             )
+
 
         _, message_type = get_message_type(message)
         if message_type == Types.TEXT:
@@ -165,7 +165,7 @@ async def no_longer_afk(_, message):
         for x in MENTIONED:
             msg_text = x['text']
             if len(msg_text) >= 11:
-                msg_text = '{}...'.format(x['text'])
+                msg_text = f"{x['text']}..."
             text += '- [{}](https://t.me/c/{}/{}) ({}): {}\n'.format(
                 escape_markdown(x['user']),
                 x['chat_id'],

@@ -26,16 +26,15 @@ Update your bot to latest version
 
 
 async def gen_chlog(repo, diff):
-    changelog = ""
     d_form = "%H:%M - %d/%m/%y"
-    for cl in repo.iter_commits(diff):
-        changelog += f'• [{cl.committed_datetime.strftime(d_form)}]: {cl.summary} <{cl.author}>\n'
-    return changelog
+    return "".join(
+        f'• [{cl.committed_datetime.strftime(d_form)}]: {cl.summary} <{cl.author}>\n'
+        for cl in repo.iter_commits(diff)
+    )
 
 
 async def initial_git(repo):
-    isexist = os.path.exists('nana-old')
-    if isexist:
+    if isexist := os.path.exists('nana-old'):
         shutil.rmtree('nana-old')
     os.mkdir('nana-old')
     os.rename('nana', 'nana-old/nana')
@@ -127,9 +126,8 @@ async def updater(client, message):
                         f'\nCHANGELOG:**\n`{changelog}` '
         if len(changelog_str) > 4096:
             await edrep(message, text="`Changelog is too big, view the file to see it.`")
-            file = open("nana/cache/output.txt", "w+")
-            file.write(changelog_str)
-            file.close()
+            with open("nana/cache/output.txt", "w+") as file:
+                file.write(changelog_str)
             await client.send_document(message.chat.id, "nana/cache/output.txt", reply_to_message_id=message.message_id,
                                     caption="`Changelog file`")
             os.remove("nana/cache/output.txt")
@@ -145,9 +143,9 @@ async def updater(client, message):
             if len(heroku_applications) >= 1:
                 heroku_app = heroku_applications[0]
                 heroku_git_url = heroku_app.git_url.replace(
-                    "https://",
-                    "https://api:" + HEROKU_API + "@"
+                    "https://", f"https://api:{HEROKU_API}@"
                 )
+
                 if "heroku" in repo.remotes:
                     remote = repo.remote("heroku")
                     remote.set_url(heroku_git_url)

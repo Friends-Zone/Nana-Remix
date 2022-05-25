@@ -16,30 +16,27 @@ class EqInlineKeyboardButton(InlineKeyboardButton):
 
 
 def paginate_modules(_page_n, module_dict, prefix, chat=None):
-    if not chat:
-        modules = sorted(
+    modules = (
+        sorted(
             [
                 EqInlineKeyboardButton(
                     x.__MODULE__,
-                    callback_data='{}_module({})'.format(
-                        prefix, x.__MODULE__.lower(),
-                    ),
+                    callback_data=f'{prefix}_module({chat},{x.__MODULE__.lower()})',
                 )
                 for x in module_dict.values()
-            ],
+            ]
         )
-    else:
-        modules = sorted(
+        if chat
+        else sorted(
             [
                 EqInlineKeyboardButton(
                     x.__MODULE__,
-                    callback_data='{}_module({},{})'.format(
-                        prefix, chat, x.__MODULE__.lower(),
-                    ),
+                    callback_data=f'{prefix}_module({x.__MODULE__.lower()})',
                 )
                 for x in module_dict.values()
-            ],
+            ]
         )
+    )
 
     pairs = [
         modules[

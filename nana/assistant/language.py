@@ -19,8 +19,7 @@ language_button_create = filters.create(language_button_callback)
 
 @setbot.on_callback_query(language_button_create)
 async def locale_button(client, query):
-    lang_match = re.findall(r"en-US|hi", query.data)
-    if lang_match:
+    if lang_match := re.findall(r"en-US|hi", query.data):
         if lang_match[0]:
             switch_to_locale(Owner, lang_match[0])
             await query.answer(text=tld('language_switch_success_pm').format(list_locales[lang_match[0]]))

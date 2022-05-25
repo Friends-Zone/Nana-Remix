@@ -270,25 +270,15 @@ async def dc_id_check(_, message):
             message.from_user.first_name,
         )
     if dc_id == 1:
-        text = "{}'s assigned DC is **DC1**, **MIA, Miami FL, USA**".format(
-            user,
-        )
+        text = f"{user}'s assigned DC is **DC1**, **MIA, Miami FL, USA**"
     elif dc_id == 2:
-        text = "{}'s assigned DC is **DC2**, **AMS, Amsterdam, NL**".format(
-            user,
-        )
+        text = f"{user}'s assigned DC is **DC2**, **AMS, Amsterdam, NL**"
     elif dc_id == 3:
-        text = "{}'s assigned DC is **DC3**, **MIA, Miami FL, USA**".format(
-            user,
-        )
+        text = f"{user}'s assigned DC is **DC3**, **MIA, Miami FL, USA**"
     elif dc_id == 4:
-        text = "{}'s assigned DC is **DC4**, **AMS, Amsterdam, NL**".format(
-            user,
-        )
+        text = f"{user}'s assigned DC is **DC4**, **AMS, Amsterdam, NL**"
     elif dc_id == 5:
-        text = "{}'s assigned DC is **DC5**, **SIN, Singapore, SG**".format(
-            user,
-        )
+        text = f"{user}'s assigned DC is **DC5**, **SIN, Singapore, SG**"
     else:
         text = f"{user}'s assigned DC is **unknown**"
     await edit_or_reply(message, text=text)
@@ -354,34 +344,34 @@ async def get_id(_, message):
         elif rep.from_user:
             user_id = rep.from_user.id
     if user_id:
-        if rep.forward_from:
-            user_detail = (
+        user_detail = (
+            (
                 '**Forwarded from user ID**: `{}`\n'.format(
                     message.reply_to_message.forward_from.id,
                 )
             )
-        else:
-            user_detail = '**User ID**: `{}`\n'.format(
+            if rep.forward_from
+            else '**User ID**: `{}`\n'.format(
                 message.reply_to_message.from_user.id,
             )
-        user_detail += '**Message ID**: `{}`'.format(
-            message.reply_to_message.message_id,
-        )
+        ) + f'**Message ID**: `{message.reply_to_message.message_id}`'
+
         await edit_or_reply(message, text=user_detail)
     elif file_id:
-        if rep.forward_from:
-            user_detail = (
+        user_detail = (
+            (
                 '**Forwarded from user ID**: `{}`\n'.format(
                     message.reply_to_message.forward_from.id,
                 )
             )
-        else:
-            user_detail = '**User ID**: `{}`\n'.format(
+            if rep.forward_from
+            else '**User ID**: `{}`\n'.format(
                 message.reply_to_message.from_user.id,
             )
-        user_detail += '**Message ID**: `{}`\n\n'.format(
+        ) + '**Message ID**: `{}`\n\n'.format(
             message.reply_to_message.message_id,
         )
+
         user_detail += file_id
         await edit_or_reply(message, text=user_detail)
     else:

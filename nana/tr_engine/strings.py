@@ -7,15 +7,11 @@ from nana import Owner
 
 LANGUAGES = ['en-US', 'hi']
 
-strings = {
-    i: yaml.full_load(open("locales/" + i + ".yml", "r")) for i in LANGUAGES
-}
+strings = {i: yaml.full_load(open(f"locales/{i}.yml", "r")) for i in LANGUAGES}
 
 
 def tld(t, show_none=True):
-    LANGUAGE = prev_locale(Owner)
-
-    if LANGUAGE:
+    if LANGUAGE := prev_locale(Owner):
         LOCALE = LANGUAGE.locale_name
         if LOCALE in ('en-US') and t in strings['en-US']:
             result = decode(
@@ -40,9 +36,7 @@ def tld(t, show_none=True):
 
 
 def tld_list(t):
-    LANGUAGE = prev_locale(Owner)
-
-    if LANGUAGE:
+    if LANGUAGE := prev_locale(Owner):
         LOCALE = LANGUAGE.locale_name
         if LOCALE in ('en-US') and t in strings['en-US']:
             return strings['en-US'][t]

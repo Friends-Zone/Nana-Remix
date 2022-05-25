@@ -27,7 +27,7 @@ class SelfNotes(BASE):
 
     def __repr__(self):
         """get db message"""
-        return '<Note %s>' % self.name
+        return f'<Note {self.name}>'
 
 
 SelfNotes.__table__.create(checkfirst=True)
@@ -54,8 +54,7 @@ SELF_NOTES = {}
 def save_selfnote(user_id, note_name, note_data, msgtype, file=None):
     global SELF_NOTES
     with INSERTION_LOCK:
-        prev = SESSION.query(SelfNotes).get((user_id, note_name))
-        if prev:
+        if prev := SESSION.query(SelfNotes).get((user_id, note_name)):
             SESSION.delete(prev)
         note = SelfNotes(
             user_id,
@@ -86,29 +85,21 @@ def get_all_selfnotes(user_id):
     if not SELF_NOTES.get(user_id):
         SELF_NOTES[user_id] = {}
         return None
-    allnotes = list(SELF_NOTES[user_id])
-    allnotes.sort()
-    return allnotes
+    return sorted(SELF_NOTES[user_id])
 
 
 def get_all_selfnotes_inline(user_id):
     if not SELF_NOTES.get(user_id):
         SELF_NOTES[user_id] = {}
         return None
-    # Sorting
-    allnotes = {}
-    sortnotes = list(SELF_NOTES[user_id])
-    sortnotes.sort()
-    for x in sortnotes:
-        allnotes[x] = SELF_NOTES[user_id][x]
-    return allnotes
+    sortnotes = sorted(SELF_NOTES[user_id])
+    return {x: SELF_NOTES[user_id][x] for x in sortnotes}
 
 
 def rm_selfnote(user_id, note_name):
     global SELF_NOTES
     with INSERTION_LOCK:
-        note = SESSION.query(SelfNotes).get((user_id, note_name))
-        if note:
+        if note := SESSION.query(SelfNotes).get((user_id, note_name)):
             SESSION.delete(note)
             SESSION.commit()
             SELF_NOTES[user_id].pop(note_name)

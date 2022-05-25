@@ -50,7 +50,7 @@ async def evaluation_curr(_, message):
     curr2 = message.text.split(None, 3)[3].upper()
     try:
         conv = c.convert(int(value), curr1, curr2)
-        text = '{} {} = {} {}'.format(curr1, value, curr2, f'{conv:,.2f}')
+        text = f'{curr1} {value} = {curr2} {conv:,.2f}'
         await edit_or_reply(message, text=text)
     except ValueError as err:
         await edit_or_reply(message, text=str(err))

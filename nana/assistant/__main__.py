@@ -22,29 +22,28 @@ if DB_AVAILABLE:
 
 @setbot.on_message(filters.private & ~filters.user(AdminSettings))
 async def un_auth(_client, message):
-    if message.chat.id is not AdminSettings:
-        msg = f"""
+    if message.chat.id is AdminSettings:
+        return
+    msg = f"""
 Hi {message.chat.first_name},
 You must be looking forward on how I work.
 In that case I can give you helpful links to self host me on your own.
 Here are some links for you
         """
-        buttons = [
-            [
-                InlineKeyboardButton(
-                    "Documentation", url="https://aman-a.gitbook.io/nana-remix/"
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    "Repository", url="https://github.com/pokurt/Nana-Remix"
-                ),
-                InlineKeyboardButton("Support", url="https://t.me/nanabotsupport"),
-            ],
-        ]
-        await message.reply(msg, reply_markup=InlineKeyboardMarkup(buttons))
-    else:
-        return
+    buttons = [
+        [
+            InlineKeyboardButton(
+                "Documentation", url="https://aman-a.gitbook.io/nana-remix/"
+            )
+        ],
+        [
+            InlineKeyboardButton(
+                "Repository", url="https://github.com/pokurt/Nana-Remix"
+            ),
+            InlineKeyboardButton("Support", url="https://t.me/nanabotsupport"),
+        ],
+    ]
+    await message.reply(msg, reply_markup=InlineKeyboardMarkup(buttons))
 
 
 @setbot.on_message(filters.user(AdminSettings) & filters.command(["start"]))
@@ -61,7 +60,7 @@ async def start(_client, message):
             me = await app.get_me()
         except ConnectionError:
             me = None
-        userbot_stat = 'Stopped' if not me else 'Running'
+        userbot_stat = 'Running' if me else 'Stopped'
         db_stat = len(get_all_chats()) if DB_AVAILABLE else 'None'
         buttons = InlineKeyboardMarkup(
             [[InlineKeyboardButton(text=tld("help_btn"), callback_data="help_back"), InlineKeyboardButton('Language', callback_data='set_lang_')]])
@@ -96,8 +95,7 @@ async def get_myself(client, message):
         return
     getphoto = await client.get_profile_photos(me.id)
     getpp = None if len(getphoto) == 0 else getphoto[0].file_id
-    text = "**ℹ️ Your profile:**\n"
-    text += "First name: {}\n".format(me.first_name)
+    text = "**ℹ️ Your profile:**\n" + "First name: {}\n".format(me.first_name)
     if me.last_name:
         text += "Last name: {}\n".format(me.last_name)
     text += "User ID: `{}`\n".format(me.id)
@@ -105,7 +103,7 @@ async def get_myself(client, message):
         text += "Username: @{}\n".format(me.username)
     text += "Phone number: `{}`\n".format(me.phone_number)
     text += "`Nana Version    : v{}`\n".format(USERBOT_VERSION)
-    text += "`Manager Version : v{}`".format(ASSISTANT_VERSION)
+    text += f"`Manager Version : v{ASSISTANT_VERSION}`"
     button = InlineKeyboardMarkup([[InlineKeyboardButton("Hide phone number", callback_data="hide_number")]])
     if me.photo:
         await client.send_photo(message.chat.id, photo=getpp, caption=text, reply_markup=button)

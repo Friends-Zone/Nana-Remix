@@ -76,12 +76,11 @@ async def get_driveid(driveid):
 async def get_driveinfo(driveid):
     getdrivename = BeautifulSoup(
         requests.get(
-            'https://drive.google.com/file/d/{}/view'.format(
-                driveid,
-            ),
+            f'https://drive.google.com/file/d/{driveid}/view',
             allow_redirects=False,
-        ).content,
+        ).content
     )
+
     return cleanhtml(str(getdrivename.find('title'))).split(' - ')[0]
 
 

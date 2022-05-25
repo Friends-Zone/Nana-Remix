@@ -57,7 +57,7 @@ async def adminlist(client, message):
     alladmins = client.iter_chat_members(chat, filter='administrators')
     async for a in alladmins:
         try:
-            nama = a.user.first_name + ' ' + a.user.last_name
+            nama = f'{a.user.first_name} {a.user.last_name}'
         except BaseException:
             nama = a.user.first_name
         if nama is None:
@@ -134,11 +134,10 @@ async def report_admin(client, message):
             teks = tld('reportadmins_one').format(
                 mention_html(user.id, user.first_name),
             )
+    elif text:
+        teks = f'{html.escape(text)}'
     else:
-        if text:
-            teks = '{}'.format(html.escape(text))
-        else:
-            teks = tld('reportadmins_two').format(grup.title)
+        teks = tld('reportadmins_two').format(grup.title)
     teks += ''.join(admin)
     if message.reply_to_message:
         await client.send_message(
@@ -187,7 +186,7 @@ async def get_list_bots(client, message):
     bots = []
     async for a in getbots:
         try:
-            nama = a.user.first_name + ' ' + a.user.last_name
+            nama = f'{a.user.first_name} {a.user.last_name}'
         except BaseException:
             nama = a.user.first_name
         if nama is None:

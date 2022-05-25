@@ -56,7 +56,8 @@ async def youtube_download(_client, message):
 		link = args[1]
 		reso = args[2]
 		text = "🎬 **Title:** [{}]({})\n".format(escape_markdown(yt.title), link)
-		stream = yt.streams.filter(file_extension='mp4').filter(resolution="{}".format(reso)).first()
+		stream = (yt.streams.filter(file_extension='mp4').filter(
+		    resolution=f"{reso}").first())
 		stream.download('nana/downloads', filename="tempvid")
 		await app.send_video(message.chat.id, video="nana/downloads/tempvid.mp4")
 		os.remove('nana/downloads/tempvid.mp4')
@@ -77,7 +78,7 @@ async def youtube_music(_client, message):
 		await edrep(message, text="Invaild URL!")
 		return
 	try:
-		audios = [audio for audio in video.audiostreams]
+		audios = list(video.audiostreams)
 		audios.sort(key=lambda a: (int(a.quality.strip('k')) * -1))
 		music = audios[0]
 		text = "[⁣](https://i.ytimg.com/vi/{}/0.jpg)🎬 **Title:** [{}]({})\n".format(video.videoid,
@@ -86,7 +87,8 @@ async def youtube_music(_client, message):
 																				)
 		text += "👤 **Author:** `{}`\n".format(video.author)
 		text += "🕦 **Duration:** `{}`\n".format(video.duration)
-		origtitle = re.sub(r'[\\/*?:"<>|\[\]]', "", str(music.title + "." + music._extension))
+		origtitle = re.sub(r'[\\/*?:"<>|\[\]]', "",
+		                   str(f"{music.title}.{music._extension}"))
 		musictitle = re.sub(r'[\\/*?:"<>|\[\]]', "", str(music.title))
 		musicdate = video._ydl_info['upload_date'][:4]
 		r = requests.get(f"https://i.ytimg.com/vi/{video.videoid}/maxresdefault.jpg", stream=True)
@@ -130,7 +132,7 @@ async def youtube_music(_client, message):
 			os.system(
 				f'ffmpeg -loglevel panic -i "nana/downloads/{origtitle}" -metadata title="{music.title}" -metadata author="{video.author}" -metadata album="{video.author}" -metadata album_artist="{video.author}" -metadata genre="{video._category}" -metadata date="{musicdate}" -acodec libmp3lame -aq 4 -y "nana/downloads/{musictitle}.mp3"')
 		try:
-			os.remove("nana/downloads/{}".format(origtitle))
+			os.remove(f"nana/downloads/{origtitle}")
 		except FileNotFoundError:
 			pass
 		getprev = requests.get(video.thumb, stream=True)

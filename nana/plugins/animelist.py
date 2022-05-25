@@ -50,7 +50,7 @@ Get your favourite list of anime
 def shorten(description, info='anilist.co'):
     ms_g = ''
     if len(description) > 700:
-        description = description[0:500] + '....'
+        description = description[:500] + '....'
         ms_g += f'\n**Description**: __{description}__[Read More]({info})'
     else:
         ms_g += f'\n**Description**: __{description}__'
@@ -66,17 +66,18 @@ def shorten(description, info='anilist.co'):
 def t(milliseconds: int) -> str:
     """Inputs time in milliseconds, to get beautified time,
     as string"""
-    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    seconds, milliseconds = divmod(milliseconds, 1000)
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
     tmp = (
-        ((str(days) + ' Days, ') if days else '')
-        + ((str(hours) + ' Hours, ') if hours else '')
-        + ((str(minutes) + ' Minutes, ') if minutes else '')
-        + ((str(seconds) + ' Seconds, ') if seconds else '')
-        + ((str(milliseconds) + ' ms, ') if milliseconds else '')
+        (f'{str(days)} Days, ' if days else '')
+        + (f'{str(hours)} Hours, ' if hours else '')
+        + (f'{str(minutes)} Minutes, ' if minutes else '')
+        + (f'{str(seconds)} Seconds, ' if seconds else '')
+        + (f'{str(milliseconds)} ms, ' if milliseconds else '')
     )
+
     return tmp[:-2]
 
 
@@ -150,8 +151,7 @@ async def character_search(client, message):
         description = f"{json['description']}"
         site_url = json.get('siteUrl')
         ms_g += shorten(description, site_url)
-        image = json.get('image', None)
-        if image:
+        if image := json.get('image', None):
             image = image.get('large')
             await message.delete()
             await client.send_photo(message.chat.id, photo=image, caption=ms_g)
@@ -243,8 +243,7 @@ async def remfav_callback(_, __, query):
 async def add_favorite(_, query):
     if query.from_user.id in AdminSettings:
         match = query.data.split('_')[1]
-        add = sql.add_fav(Owner, match)
-        if add:
+        if add := sql.add_fav(Owner, match):
             await query.answer('Added to favourites.', show_alert=True)
         else:
             await query.answer(

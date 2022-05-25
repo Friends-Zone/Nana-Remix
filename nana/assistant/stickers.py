@@ -59,9 +59,8 @@ def get_stickerlist(client,message):
     global TEMP_KEYBOARD, USER_SET
     if message.from_user and message.from_user.id in list(USER_SET):
         return True
-    else:
-        TEMP_KEYBOARD = []
-        USER_SET = {}
+    TEMP_KEYBOARD = []
+    USER_SET = {}
 
 @setbot.on_message(get_stickerlist)
 async def set_stickers(client, message):
@@ -75,7 +74,7 @@ async def set_stickers(client, message):
             set_sticker_set(message.from_user.id, message.text)
         elif USER_SET["type"] == 2:
             set_stanim_set(message.from_user.id, message.text)
-        status = "Ok, sticker was set to `{}`".format(message.text)
+        status = f"Ok, sticker was set to `{message.text}`"
     else:
         status = "Invalid pack selected."
     TEMP_KEYBOARD = []

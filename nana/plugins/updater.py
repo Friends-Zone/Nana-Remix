@@ -46,8 +46,7 @@ async def gen_chlog(repo, diff):
 
 
 async def initial_git(repo):
-    isexist = os.path.exists('nana-old')
-    if isexist:
+    if isexist := os.path.exists('nana-old'):
         shutil.rmtree('nana-old')
     os.mkdir('nana-old')
     os.rename('nana', 'nana-old/nana')

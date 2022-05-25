@@ -55,10 +55,12 @@ async def pm_block(client, message):
                     )
                     await client.block_user(message.chat.id)
                     return
-        if not get_req(message.chat.id):
-            x = await client.get_inline_bot_results(BotUsername, 'engine_pm')
-        else:
-            x = await client.get_inline_bot_results(BotUsername, 'engine_pm')
+        x = (
+            await client.get_inline_bot_results(BotUsername, 'engine_pm')
+            if get_req(message.chat.id)
+            else await client.get_inline_bot_results(BotUsername, 'engine_pm')
+        )
+
         await client.send_inline_bot_result(
             message.chat.id,
             query_id=x.query_id,
@@ -75,12 +77,11 @@ async def pm_block(client, message):
 async def approve_pm(_, message):
     if message.chat.type == 'private':
         set_whitelist(message.chat.id, True)
+    elif message.reply_to_message:
+        set_whitelist(message.reply_to_message.from_user.id, True)
     else:
-        if message.reply_to_message:
-            set_whitelist(message.reply_to_message.from_user.id, True)
-        else:
-            message.delete()
-            return
+        message.delete()
+        return
     await message.edit('**Approved to PM!**')
     await asyncio.sleep(3)
     await message.delete()
@@ -94,12 +95,11 @@ async def approve_pm(_, message):
 async def revoke_pm_block(_, message):
     if message.chat.type == 'private':
         del_whitelist(message.chat.id)
+    elif message.reply_to_message:
+        del_whitelist(message.reply_to_message.from_user.id)
     else:
-        if message.reply_to_message:
-            del_whitelist(message.reply_to_message.from_user.id)
-        else:
-            message.delete()
-            return
+        message.delete()
+        return
     await message.edit('**PM permission revoked!**')
     await asyncio.sleep(3)
     await message.delete()

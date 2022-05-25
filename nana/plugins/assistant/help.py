@@ -44,7 +44,7 @@ def get_readable_time(seconds: int) -> str:
     for x in range(len(time_list)):
         time_list[x] = str(time_list[x]) + time_suffix_list[x]
     if len(time_list) == 4:
-        ping_time += time_list.pop() + ', '
+        ping_time += f'{time_list.pop()}, '
     time_list.reverse()
     ping_time += ':'.join(time_list)
     return ping_time
@@ -104,7 +104,7 @@ async def help_button(_, query):
     mod_match = re.match(r'help_module\((.+?)\)', query.data)
     back_match = re.match(r'help_back', query.data)
     if mod_match:
-        module = mod_match.group(1)
+        module = mod_match[1]
         text = (
             'This is help for the module **{}**:\n'.format(
                 HELP_COMMANDS[module].__MODULE__,

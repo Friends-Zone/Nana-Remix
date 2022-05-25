@@ -42,12 +42,13 @@ async def note_func(string, client, query, answers):
             button = build_keyboard(button)
             answers.append(
                 InlineQueryResultArticle(
-                    title='Note #{}'.format(list(allnotes)[x]),
+                    title=f'Note #{list(allnotes)[x]}',
                     description=note,
                     input_message_content=InputTextMessageContent(note),
                     reply_markup=InlineKeyboardMarkup(button),
-                ),
+                )
             )
+
         await client.answer_inline_query(
             query.id,
             results=answers,

@@ -31,7 +31,7 @@ def get_readable_time(seconds: int) -> str:
     for x in range(len(time_list)):
         time_list[x] = str(time_list[x]) + time_suffix_list[x]
     if len(time_list) == 4:
-        ping_time += time_list.pop() + ", "
+        ping_time += f"{time_list.pop()}, "
     time_list.reverse()
     ping_time += ":".join(time_list)
     return ping_time
@@ -70,7 +70,7 @@ async def help_button(_client, query):
     mod_match = re.match(r"help_module\((.+?)\)", query.data)
     back_match = re.match(r"help_back", query.data)
     if mod_match:
-        module = mod_match.group(1)
+        module = mod_match[1]
         text = "This is help for the module **{}**:\n".format(HELP_COMMANDS[module].__MODULE__) \
                + HELP_COMMANDS[module].__HELP__
 
@@ -95,5 +95,5 @@ async def stats(_client, message):
     text += f"<b>Stickers Count:</b> <code>{count} across {len(all_sets)} sets</code>\n"
     text += "<b>Message received:</b> `{} messages`\n".format(get_msgc())
     uptime = get_readable_time((time.time() - StartTime))
-    text += ("<b>Nana uptime:</b> <code>{}</code>".format(uptime))
+    text += f"<b>Nana uptime:</b> <code>{uptime}</code>"
     await message.reply_text(text, quote=True)

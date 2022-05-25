@@ -68,7 +68,7 @@ async def start(_, message):
             me = await app.get_me()
         except ConnectionError:
             me = None
-        userbot_stat = 'Stopped' if not me else 'Running'
+        userbot_stat = 'Running' if me else 'Stopped'
         db_stat = len(get_all_chats()) if DB_AVAILABLE else 'None'
         buttons = InlineKeyboard(row_width=1)
         buttons.add(

@@ -35,10 +35,7 @@ async def weather(_, message):
     if len(message.command) > 1:
         location = message.command[1]
         headers = {'user-agent': 'httpie'}
-        url = 'https://wttr.in/{}?mnTC0&lang={}'.format(
-            location,
-            prev_locale(Owner).locale_name,
-        )
+        url = f'https://wttr.in/{location}?mnTC0&lang={prev_locale(Owner).locale_name}'
         async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(url) as resp:
                 data = await resp.text()
@@ -47,7 +44,5 @@ async def weather(_, message):
                 message, text='`Sorry, we cannot process this request today!`',
             )
         else:
-            weather_data = '<code>{}</code>'.format(
-                escape(data.replace('report', 'Report')),
-            )
+            weather_data = f"<code>{escape(data.replace('report', 'Report'))}</code>"
             await edit_or_reply(message, text=weather_data, parse_mode='html')

@@ -31,16 +31,15 @@ api_client = LydiaAI(CoffeeHouseAPI)
 async def add_chat(_client, message):
     global api_client
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
+    if is_chat := sql.is_chat(chat_id):
+        await edrep(message, text="`AI is already enabled for this chat!`")
+
+    else:
         ses = api_client.create_session()
         ses_id = str(ses.id)
         expires = str(ses.expires)
         sql.set_ses(chat_id, ses_id, expires)
         await edrep(message, text="`AI successfully enabled for this chat!`")
-    else:
-        await edrep(message, text="`AI is already enabled for this chat!`")
-
     await asyncio.sleep(5)
     await message.delete()
 
@@ -48,13 +47,12 @@ async def add_chat(_client, message):
 @app.on_message(filters.user(AdminSettings) & filters.command("rmchat", Command))
 async def remove_chat(_client, message):
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
-        await edrep(message, text="`AI isn't enabled here in the first place!`")
-    else:
+    if is_chat := sql.is_chat(chat_id):
         sql.rem_chat(chat_id)
         await edrep(message, text="`AI disabled successfully!`")
 
+    else:
+        await edrep(message, text="`AI isn't enabled here in the first place!`")
     await asyncio.sleep(5)
     await message.delete()
 
@@ -93,11 +91,7 @@ async def chat_bot(client, message):
 async def check_message(_client, message):
     if message.chat.type == 'private':
         return True
-    else:
-        if message.text.lower() == f"@{OwnerUsername}":
-            return True
-        if message.reply_to_message:
-            if message.reply_to_message.from_user.id == Owner:
-                return True
-            else:
-                return False
+    if message.text.lower() == f"@{OwnerUsername}":
+        return True
+    if message.reply_to_message:
+        return message.reply_to_message.from_user.id == Owner

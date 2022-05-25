@@ -229,16 +229,13 @@ async def owo(_, message):
     reply_text = re.sub(r'N([aeiouAEIOU])', r'Ny\1', reply_text)
     reply_text = re.sub(r'Ｎ([ａｅｉｏｕＡＥＩＯＵ])', r'Ｎｙ\1', reply_text)
     reply_text = re.sub(
-        r'\!+', ' ' + random.choice(meme_strings.faces),
-        reply_text,
+        r'\!+', f' {random.choice(meme_strings.faces)}', reply_text
     )
-    reply_text = re.sub(
-        r'！+', ' ' + random.choice(meme_strings.faces),
-        reply_text,
-    )
+
+    reply_text = re.sub(r'！+', f' {random.choice(meme_strings.faces)}', reply_text)
     reply_text = reply_text.replace('ove', 'uv')
     reply_text = reply_text.replace('ｏｖｅ', 'ｕｖ')
-    reply_text += ' ' + random.choice(meme_strings.faces)
+    reply_text += f' {random.choice(meme_strings.faces)}'
     await edit_or_reply(message, text=reply_text)
 
 

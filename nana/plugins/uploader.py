@@ -47,16 +47,15 @@ async def PictureUploader(client, message):
         else:
             await client.send_photo(message.chat.id, 'nana/cache/pic.png')
         os.remove('nana/cache/pic.png')
+    elif message.reply_to_message:
+        await client.send_photo(
+            message.chat.id,
+            photo,
+            '',
+            reply_to_message_id=message.reply_to_message.message_id,
+        )
     else:
-        if message.reply_to_message:
-            await client.send_photo(
-                message.chat.id,
-                photo,
-                '',
-                reply_to_message_id=message.reply_to_message.message_id,
-            )
-        else:
-            await client.send_photo(message.chat.id, photo, '')
+        await client.send_photo(message.chat.id, photo, '')
 
 
 @app.on_message(
@@ -82,12 +81,11 @@ async def StickerUploader(client, message):
         else:
             await client.send_sticker(message.chat.id, 'nana/cache/stiker.png')
         os.remove('nana/cache/stiker.png')
+    elif message.reply_to_message:
+        await client.send_sticker(
+            message.chat.id,
+            photo,
+            reply_to_message_id=message.reply_to_message.message_id,
+        )
     else:
-        if message.reply_to_message:
-            await client.send_sticker(
-                message.chat.id,
-                photo,
-                reply_to_message_id=message.reply_to_message.message_id,
-            )
-        else:
-            await client.send_sticker(message.chat.id, photo)
+        await client.send_sticker(message.chat.id, photo)

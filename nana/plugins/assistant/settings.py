@@ -26,10 +26,12 @@ async def is_userbot_run():
 
 async def get_text_settings():
     me = await is_userbot_run()
-    if not me:
-        text = tld('settings_userbot_stop').format(USERBOT_VERSION)
-    else:
-        text = tld('settings_userbot_running').format(USERBOT_VERSION)
+    text = (
+        tld('settings_userbot_running').format(USERBOT_VERSION)
+        if me
+        else tld('settings_userbot_stop').format(USERBOT_VERSION)
+    )
+
     text += tld('settings_assistant_running').format(ASSISTANT_VERSION)
     text += tld('settings_database').format(DB_AVAILABLE)
     text += tld('settings_python').format(python_version())

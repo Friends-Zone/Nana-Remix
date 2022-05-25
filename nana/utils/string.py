@@ -44,10 +44,9 @@ def extract_time(message, time_val):
         return bantime
     else:
         message.reply(
-            'Invalid time type specified. Needed m, h, or s. got: {}'.format(
-                time_val[-1],
-            ),
+            f'Invalid time type specified. Needed m, h, or s. got: {time_val[-1]}'
         )
+
         return ''
 
 
@@ -59,10 +58,10 @@ def extract_time_str(message, time_val):
             message.reply('Unspecified amount of time.')
             return ''
 
-        if unit == 'm':
-            bantime = int(int(time_num) * 60)
-        elif unit == 'h':
+        if unit == 'h':
             bantime = int(int(time_num) * 60 * 60)
+        elif unit == 'm':
+            bantime = int(int(time_num) * 60)
         elif unit == 's':
             bantime = int(int(time_num) * 24 * 60 * 60)
         else:
@@ -71,10 +70,9 @@ def extract_time_str(message, time_val):
         return bantime
     else:
         message.reply(
-            'Invalid time type specified. Needed m, h, or s. got: {}'.format(
-                time_val[-1],
-            ),
+            f'Invalid time type specified. Needed m, h, or s. got: {time_val[-1]}'
         )
+
         return ''
 
 
@@ -82,11 +80,11 @@ def make_time(time_val):
     if int(time_val) == 0:
         return '0'
     if int(time_val) <= 3600:
-        bantime = str(int(time_val / 60)) + 'm'
+        bantime = f'{int(time_val / 60)}m'
     elif int(time_val) >= 3600 and time_val <= 86400:
-        bantime = str(int(time_val / 60 / 60)) + 'h'
+        bantime = f'{int(time_val / 60 / 60)}h'
     elif int(time_val) >= 86400:
-        bantime = str(int(time_val / 24 / 60 / 60)) + 'd'
+        bantime = f'{int(time_val / 24 / 60 / 60)}d'
     return bantime
 
 
@@ -130,8 +128,7 @@ def parse_button(text):
         else:
             note_data += markdown_note[prev:to_check]
             prev = match.start(1) - 1
-    else:
-        note_data += markdown_note[prev:]
+    note_data += markdown_note[prev:]
 
     return note_data, buttons
 

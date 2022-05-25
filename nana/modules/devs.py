@@ -71,9 +71,12 @@ async def pic(chat, photo, caption=None):
 
 async def aexec(code, client, message):
     exec(
-        f'async def __aexec(client, message): ' +
-        ''.join(f'\n {l}' for l in code.split('\n'))
+        (
+            'async def __aexec(client, message): '
+            + ''.join(f'\n {l}' for l in code.split('\n'))
+        )
     )
+
     return await locals()['__aexec'](client, message)
 
 
@@ -85,18 +88,15 @@ async def sd_reveal(client, message):
     if len(message.text.split()) == 1:
         await message.delete()
         return
+    await message.delete()
+    reveal_pic = 'nana/downloads/pic_reveal.png'
+    await client.download_media(message.reply_to_message.photo, file_name=reveal_pic)
     if tags:
-        await message.delete()
-        reveal_pic = 'nana/downloads/pic_reveal.png'
-        await client.download_media(message.reply_to_message.photo, file_name=reveal_pic)
         await client.send_photo('me', reveal_pic)
-        os.remove(reveal_pic)
     else:
-        await message.delete()
-        reveal_pic = 'nana/downloads/pic_reveal.png'
-        await client.download_media(message.reply_to_message.photo, file_name=reveal_pic)
         await client.send_photo(message.chat.id, reveal_pic)
-        os.remove(reveal_pic)
+
+    os.remove(reveal_pic)
 
 
 @app.on_message(filters.user(AdminSettings) & filters.command("eval", Command))
@@ -213,9 +213,8 @@ async def terminal(client, message):
         output = None
     if output:
         if len(output) > 4096:
-            file = open("nana/cache/output.txt", "w+")
-            file.write(output)
-            file.close()
+            with open("nana/cache/output.txt", "w+") as file:
+                file.write(output)
             await client.send_document(message.chat.id, "nana/cache/output.txt", reply_to_message_id=message.message_id,
                                        caption="`Output file`")
             os.remove("nana/cache/output.txt")
@@ -248,17 +247,22 @@ async def dc_id_check(_client, message):
         dc_id = user.dc_id
         user = mention_markdown(message.from_user.id, message.from_user.first_name)
     if dc_id == 1:
-        text = "{}'s assigned datacenter is **DC1**, located in **MIA, Miami FL, USA**".format(user)
+        text = f"{user}'s assigned datacenter is **DC1**, located in **MIA, Miami FL, USA**"
+
     elif dc_id == 2:
-        text = "{}'s assigned datacenter is **DC2**, located in **AMS, Amsterdam, NL**".format(user)
+        text = f"{user}'s assigned datacenter is **DC2**, located in **AMS, Amsterdam, NL**"
+
     elif dc_id == 3:
-        text = "{}'s assigned datacenter is **DC3**, located in **MIA, Miami FL, USA**".format(user)
+        text = f"{user}'s assigned datacenter is **DC3**, located in **MIA, Miami FL, USA**"
+
     elif dc_id == 4:
-        text = "{}'s assigned datacenter is **DC4**, located in **AMS, Amsterdam, NL**".format(user)
+        text = f"{user}'s assigned datacenter is **DC4**, located in **AMS, Amsterdam, NL**"
+
     elif dc_id == 5:
-        text = "{}'s assigned datacenter is **DC5**, located in **SIN, Singapore, SG**".format(user)
+        text = f"{user}'s assigned datacenter is **DC5**, located in **SIN, Singapore, SG**"
+
     else:
-        text = "{}'s assigned datacenter is **Unknown**".format(user)
+        text = f"{user}'s assigned datacenter is **Unknown**"
     await edrep(message, text=text)
 
 

@@ -98,8 +98,7 @@ async def set_pfp(client, message):
     filters.command('vpfp', COMMAND_PREFIXES),
 )
 async def view_pfp(client, message):
-    replied = message.reply_to_message
-    if replied:
+    if replied := message.reply_to_message:
         user = await client.get_users(replied.from_user.id)
     else:
         user = await client.get_me()

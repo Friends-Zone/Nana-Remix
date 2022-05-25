@@ -35,35 +35,20 @@ async def translate(_, message):
             await message.delete()
             return
         target = message.text.split()[1]
-        if message.reply_to_message.text:
-            text = message.reply_to_message.text
-        else:
-            text = message.reply_to_message.caption
-        try:
-            tekstr = await trl(text, targetlang=target)
-        except ValueError as err:
-            await edit_or_reply(
-                message, text=f'Error: `{str(err)}`', parse_mode='Markdown',
-            )
-            return
+        text = message.reply_to_message.text or message.reply_to_message.caption
     else:
         if len(message.text.split()) <= 2:
             await message.delete()
             return
         target = message.text.split(None, 2)[1]
         text = message.text.split(None, 2)[2]
-        try:
-            tekstr = await trl(text, targetlang=target)
-        except ValueError as err:
-            await edit_or_reply(
-                message,
-                text='Error: `{}`'.format(
-                    str(err),
-                ),
-                parse_mode='Markdown',
-            )
-            return
-
+    try:
+        tekstr = await trl(text, targetlang=target)
+    except ValueError as err:
+        await edit_or_reply(
+            message, text=f'Error: `{str(err)}`', parse_mode='Markdown',
+        )
+        return
     await edit_or_reply(
         message,
         text='**Translated:**\n```{}```\n\n**Detected Language:** `{}`'.format(

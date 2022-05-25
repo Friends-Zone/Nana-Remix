@@ -41,8 +41,13 @@ api_ = LydiaAI(CoffeeHouseAPI)
 async def add_chat(_, message):
     global api_
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
+    if is_chat := sql.is_chat(chat_id):
+        await edit_or_reply(
+            message,
+            text='`AI is already enabled for this chat!`',
+        )
+
+    else:
         ses = api_.create_session()
         ses_id = str(ses.id)
         expires = str(ses.expires)
@@ -51,12 +56,6 @@ async def add_chat(_, message):
             message,
             text='`AI successfully enabled for this chat!`',
         )
-    else:
-        await edit_or_reply(
-            message,
-            text='`AI is already enabled for this chat!`',
-        )
-
     await asyncio.sleep(5)
     await message.delete()
 
@@ -67,16 +66,15 @@ async def add_chat(_, message):
 )
 async def remove_chat(_, message):
     chat_id = message.chat.id
-    is_chat = sql.is_chat(chat_id)
-    if not is_chat:
+    if is_chat := sql.is_chat(chat_id):
+        sql.rem_chat(chat_id)
+        await edit_or_reply(message, text='`AI disabled successfully!`')
+
+    else:
         await edit_or_reply(
             message,
             text="`AI isn't enabled here in the first place!`",
         )
-    else:
-        sql.rem_chat(chat_id)
-        await edit_or_reply(message, text='`AI disabled successfully!`')
-
     await asyncio.sleep(5)
     await message.delete()
 

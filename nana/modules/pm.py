@@ -34,10 +34,12 @@ async def pm_block(client, message):
                     await message.reply("Naah, I'm blocking you and reporting you to SpamWatch. Also, can you please fuck off of my life?")
                     await client.block_user(message.chat.id)
                     return
-        if not get_req(message.chat.id):
-            x = await client.get_inline_bot_results(BotUsername, "engine_pm")
-        else:
-            x = await client.get_inline_bot_results(BotUsername, "engine_pm")
+        x = (
+            await client.get_inline_bot_results(BotUsername, "engine_pm")
+            if get_req(message.chat.id)
+            else await client.get_inline_bot_results(BotUsername, "engine_pm")
+        )
+
         await client.send_inline_bot_result(message.chat.id, query_id=x.query_id,
                                             result_id=x.results[0].id, hide_via=True
                                             )

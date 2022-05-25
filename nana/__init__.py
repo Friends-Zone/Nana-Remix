@@ -151,7 +151,7 @@ async def get_self():
     getself = await app.get_me()
     Owner = getself.id
     if getself.last_name:
-        OwnerName = getself.first_name + ' ' + getself.last_name
+        OwnerName = f'{getself.first_name} {getself.last_name}'
     else:
         OwnerName = getself.first_name
     OwnerUsername = getself.username

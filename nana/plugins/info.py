@@ -93,8 +93,7 @@ async def parse_info(client, info):
         user_info += f'│ • **DC:** `{info.dc_id}`\n'
     if SPAMWATCH_API:
         sw = spamwatch.Client(SPAMWATCH_API)
-        sw_stats = sw.get_ban(info.id)
-        if sw_stats:
+        if sw_stats := sw.get_ban(info.id):
             user_info += '│ • **SW Blocked:** `{}`\n'.format(
                 sw_stats.reason,
             )
